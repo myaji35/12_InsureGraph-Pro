@@ -36,7 +36,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   ]
 
   const labels: Record<string, string> = {
-    dashboard: '{`${labels[item.key]}`}',
+    dashboard: '대시보드',
     documents: '문서 관리',
     query: '질의응답',
     graph: '그래프',
@@ -118,7 +118,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                   }}
                 >
                   <Icon className="w-5 h-5 mr-3" />
-                  <span>{t(item.key)}</span>
+                  <span>{labels[item.key]}</span>
                   {item.badge && (
                     <span className="ml-auto px-2 py-1 text-xs font-medium bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full">
                       {item.badge}
