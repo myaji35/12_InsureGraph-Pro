@@ -1,0 +1,106 @@
+"""
+API v1 Router
+
+API v1의 모든 엔드포인트를 통합하는 라우터.
+"""
+from fastapi import APIRouter, status
+from loguru import logger
+
+from app.api.v1.endpoints import query, documents, auth, monitoring
+from app.api.v1.models.query import HealthCheckResponse
+from app.services.orchestration.query_orchestrator import QueryOrchestrator
+
+
+# API v1 Router
+api_router = APIRouter()
+
+# Auth endpoints
+api_router.include_router(auth.router)
+
+# Query endpoints
+api_router.include_router(query.router)
+
+# Document endpoints
+api_router.include_router(documents.router)
+
+# Monitoring endpoints
+api_router.include_router(monitoring.router)
+
+
+# Health Check
+@api_router.get(
+    "/health",
+    response_model=HealthCheckResponse,
+    status_code=status.HTTP_200_OK,
+    summary="헬스 체크",
+    description="API 및 시스템 상태를 확인합니다.",
+    tags=["Health"],
+)
+async def health_check() -> HealthCheckResponse:
+    """
+    헬스 체크
+
+    API 서버와 주요 컴포넌트의 상태를 확인합니다.
+
+    **Returns**:
+    - HealthCheckResponse: 시스템 상태
+    """
+    try:
+        # Orchestrator health check
+        orchestrator = query.get_orchestrator()
+        health = await orchestrator.health_check()
+
+        return HealthCheckResponse(
+            status=health["status"],
+            version="1.0.0",
+            components=health["components"],
+        )
+
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return HealthCheckResponse(
+            status="unhealthy",
+            version="1.0.0",
+            components={
+                "error": str(e)
+            },
+        )
+
+
+# Root endpoint
+@api_router.get(
+    "/",
+    status_code=status.HTTP_200_OK,
+    summary="API 루트",
+    description="API v1 루트 엔드포인트",
+    tags=["Root"],
+)
+async def root():
+    """
+    API 루트
+
+    API v1의 기본 정보를 반환합니다.
+    """
+    return {
+        "name": "InsureGraph Pro API",
+        "version": "1.0.0",
+        "description": "GraphRAG 기반 보험 질의응답 API",
+        "docs_url": "/docs",
+        "health_url": "/api/v1/health",
+        "endpoints": {
+            "auth_register": "/api/v1/auth/register",
+            "auth_login": "/api/v1/auth/login",
+            "auth_refresh": "/api/v1/auth/refresh",
+            "auth_logout": "/api/v1/auth/logout",
+            "auth_me": "/api/v1/auth/me",
+            "query": "/api/v1/query",
+            "query_async": "/api/v1/query/async",
+            "query_status": "/api/v1/query/{query_id}/status",
+            "query_ws": "/api/v1/query/ws",
+            "documents": "/api/v1/documents",
+            "document_upload": "/api/v1/documents/upload",
+            "document_detail": "/api/v1/documents/{document_id}",
+            "document_content": "/api/v1/documents/{document_id}/content",
+            "document_stats": "/api/v1/documents/stats/summary",
+        },
+    }

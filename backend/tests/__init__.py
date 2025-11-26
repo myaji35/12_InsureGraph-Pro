@@ -1,0 +1,3 @@
+"""
+InsureGraph Pro test suite
+"""

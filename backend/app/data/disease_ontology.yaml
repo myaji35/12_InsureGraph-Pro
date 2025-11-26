@@ -1,0 +1,382 @@
+# Disease Ontology for InsureGraph Pro
+# Korean insurance policy disease classification
+# Version: 1.0
+# Last Updated: 2025-11-25
+
+# Top-level disease categories
+diseases:
+
+  # ============================================
+  # Cancer (악성신생물)
+  # ============================================
+  cancer:
+    standard: Cancer
+    kcd_prefix: C
+    korean_names:
+      - 악성신생물
+      - 암
+      - 암종
+      - 종양
+    english_names:
+      - Cancer
+      - Malignant Neoplasm
+      - Carcinoma
+    description: 악성 신생물 (C00-C97)
+
+    subtypes:
+      # Thyroid cancer
+      thyroid_cancer:
+        standard: ThyroidCancer
+        kcd_codes: [C73]
+        korean_names:
+          - 갑상선암
+          - 갑상선의 악성신생물
+          - 갑상선 악성종양
+        english_names:
+          - Thyroid Cancer
+          - Malignant Neoplasm of Thyroid
+        severity: minor
+
+      # Liver cancer
+      liver_cancer:
+        standard: LiverCancer
+        kcd_codes: [C22]
+        korean_names:
+          - 간암
+          - 간의 악성신생물
+          - 간세포암종
+          - 간세포암
+        english_names:
+          - Liver Cancer
+          - Hepatocellular Carcinoma
+          - HCC
+        severity: critical
+
+      # Stomach cancer
+      stomach_cancer:
+        standard: StomachCancer
+        kcd_codes: [C16]
+        korean_names:
+          - 위암
+          - 위의 악성신생물
+          - 위 악성종양
+        english_names:
+          - Gastric Cancer
+          - Stomach Cancer
+        severity: critical
+
+      # Colorectal cancer
+      colorectal_cancer:
+        standard: ColorectalCancer
+        kcd_codes: [C18, C19, C20]
+        korean_names:
+          - 대장암
+          - 결장암
+          - 직장암
+          - 대장의 악성신생물
+        english_names:
+          - Colorectal Cancer
+          - Colon Cancer
+          - Rectal Cancer
+        severity: critical
+
+      # Lung cancer
+      lung_cancer:
+        standard: LungCancer
+        kcd_codes: [C34]
+        korean_names:
+          - 폐암
+          - 기관지암
+          - 폐의 악성신생물
+        english_names:
+          - Lung Cancer
+          - Bronchogenic Carcinoma
+        severity: critical
+
+      # Breast cancer
+      breast_cancer:
+        standard: BreastCancer
+        kcd_codes: [C50]
+        korean_names:
+          - 유방암
+          - 유방의 악성신생물
+          - 유방 악성종양
+        english_names:
+          - Breast Cancer
+        severity: critical
+
+      # Prostate cancer
+      prostate_cancer:
+        standard: ProstateCancer
+        kcd_codes: [C61]
+        korean_names:
+          - 전립선암
+          - 전립선의 악성신생물
+        english_names:
+          - Prostate Cancer
+        severity: general
+
+      # Pancreatic cancer
+      pancreatic_cancer:
+        standard: PancreaticCancer
+        kcd_codes: [C25]
+        korean_names:
+          - 췌장암
+          - 췌장의 악성신생물
+        english_names:
+          - Pancreatic Cancer
+        severity: critical
+
+      # Esophageal cancer
+      esophageal_cancer:
+        standard: EsophagealCancer
+        kcd_codes: [C15]
+        korean_names:
+          - 식도암
+          - 식도의 악성신생물
+        english_names:
+          - Esophageal Cancer
+        severity: critical
+
+      # Blood cancers
+      leukemia:
+        standard: Leukemia
+        kcd_codes: [C91, C92, C93, C94, C95]
+        korean_names:
+          - 백혈병
+          - 혈액암
+          - 조혈기관의 악성신생물
+        english_names:
+          - Leukemia
+          - Blood Cancer
+        severity: critical
+
+      # Lymphoma
+      lymphoma:
+        standard: Lymphoma
+        kcd_codes: [C81, C82, C83, C84, C85]
+        korean_names:
+          - 림프종
+          - 림프계 악성신생물
+          - 호지킨병
+          - 비호지킨 림프종
+        english_names:
+          - Lymphoma
+          - Hodgkin Disease
+          - Non-Hodgkin Lymphoma
+        severity: critical
+
+  # ============================================
+  # Cardiovascular Diseases (심혈관질환)
+  # ============================================
+  cardiovascular:
+    standard: CardiovascularDisease
+    kcd_prefix: I
+    korean_names:
+      - 심혈관질환
+      - 심장질환
+      - 순환기계 질환
+    english_names:
+      - Cardiovascular Disease
+      - Heart Disease
+      - Circulatory Disease
+    description: 순환기계통의 질환 (I00-I99)
+
+    subtypes:
+      # Acute myocardial infarction
+      acute_mi:
+        standard: AcuteMyocardialInfarction
+        kcd_codes: [I21, I22]
+        korean_names:
+          - 급성심근경색증
+          - 급성심근경색
+          - 심근경색증
+          - 심근경색
+        english_names:
+          - Acute Myocardial Infarction
+          - AMI
+          - Heart Attack
+        severity: critical
+
+      # Ischemic heart disease
+      ischemic_heart:
+        standard: IschemicHeartDisease
+        kcd_codes: [I20, I21, I22, I23, I24, I25]
+        korean_names:
+          - 허혈성심질환
+          - 허혈심장질환
+          - 관상동맥질환
+        english_names:
+          - Ischemic Heart Disease
+          - IHD
+          - Coronary Artery Disease
+        severity: critical
+
+      # Angina pectoris
+      angina:
+        standard: AnginaPectoris
+        kcd_codes: [I20]
+        korean_names:
+          - 협심증
+          - 안정형 협심증
+          - 불안정형 협심증
+        english_names:
+          - Angina Pectoris
+          - Stable Angina
+          - Unstable Angina
+        severity: general
+
+      # Heart failure
+      heart_failure:
+        standard: HeartFailure
+        kcd_codes: [I50]
+        korean_names:
+          - 심부전
+          - 심장부전
+          - 울혈성 심부전
+        english_names:
+          - Heart Failure
+          - Congestive Heart Failure
+          - CHF
+        severity: critical
+
+      # Arrhythmia
+      arrhythmia:
+        standard: Arrhythmia
+        kcd_codes: [I47, I48, I49]
+        korean_names:
+          - 부정맥
+          - 심방세동
+          - 심실빈맥
+        english_names:
+          - Arrhythmia
+          - Atrial Fibrillation
+          - Ventricular Tachycardia
+        severity: general
+
+  # ============================================
+  # Cerebrovascular Diseases (뇌혈관질환)
+  # ============================================
+  cerebrovascular:
+    standard: CerebrovascularDisease
+    kcd_prefix: I
+    korean_names:
+      - 뇌혈관질환
+      - 뇌졸중
+      - 중풍
+    english_names:
+      - Cerebrovascular Disease
+      - Stroke
+      - CVA
+    description: 뇌혈관 질환 (I60-I69)
+
+    subtypes:
+      # Cerebral hemorrhage
+      cerebral_hemorrhage:
+        standard: CerebralHemorrhage
+        kcd_codes: [I60, I61, I62]
+        korean_names:
+          - 뇌출혈
+          - 뇌내출혈
+          - 지주막하출혈
+        english_names:
+          - Cerebral Hemorrhage
+          - Intracerebral Hemorrhage
+          - Subarachnoid Hemorrhage
+        severity: critical
+
+      # Cerebral infarction
+      cerebral_infarction:
+        standard: CerebralInfarction
+        kcd_codes: [I63]
+        korean_names:
+          - 뇌경색
+          - 뇌경색증
+          - 허혈성 뇌졸중
+        english_names:
+          - Cerebral Infarction
+          - Ischemic Stroke
+        severity: critical
+
+  # ============================================
+  # Diabetes (당뇨병)
+  # ============================================
+  diabetes:
+    standard: DiabetesMellitus
+    kcd_prefix: E
+    korean_names:
+      - 당뇨병
+      - 당뇨
+      - 인슐린 의존성 당뇨병
+      - 인슐린 비의존성 당뇨병
+    english_names:
+      - Diabetes Mellitus
+      - Diabetes
+      - Type 1 Diabetes
+      - Type 2 Diabetes
+    description: 당뇨병 (E10-E14)
+
+    subtypes:
+      type1_diabetes:
+        standard: Type1Diabetes
+        kcd_codes: [E10]
+        korean_names:
+          - 제1형 당뇨병
+          - 인슐린 의존성 당뇨병
+        english_names:
+          - Type 1 Diabetes
+          - Insulin-dependent Diabetes
+        severity: general
+
+      type2_diabetes:
+        standard: Type2Diabetes
+        kcd_codes: [E11]
+        korean_names:
+          - 제2형 당뇨병
+          - 인슐린 비의존성 당뇨병
+        english_names:
+          - Type 2 Diabetes
+          - Non-insulin-dependent Diabetes
+        severity: general
+
+  # ============================================
+  # Kidney Diseases (신장질환)
+  # ============================================
+  kidney:
+    standard: KidneyDisease
+    kcd_prefix: N
+    korean_names:
+      - 신장질환
+      - 콩팥병
+      - 신부전
+    english_names:
+      - Kidney Disease
+      - Renal Disease
+      - Renal Failure
+    description: 신장 질환 (N00-N29)
+
+    subtypes:
+      chronic_kidney_disease:
+        standard: ChronicKidneyDisease
+        kcd_codes: [N18]
+        korean_names:
+          - 만성 신장질환
+          - 만성 신부전
+          - 만성 콩팥병
+        english_names:
+          - Chronic Kidney Disease
+          - CKD
+          - Chronic Renal Failure
+        severity: critical
+
+# Severity levels definition
+severity_levels:
+  minor:
+    description: 소액암 (Minor cancer)
+    typical_coverage: 10-20% of general coverage
+  general:
+    description: 일반 질병
+    typical_coverage: Standard coverage
+  critical:
+    description: 중대한 질병
+    typical_coverage: Full coverage
