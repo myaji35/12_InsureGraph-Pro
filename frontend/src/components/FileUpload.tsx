@@ -95,6 +95,9 @@ export default function FileUpload({
     <div>
       {!selectedFile ? (
         <div
+          role="button"
+          tabIndex={0}
+          aria-label={`파일 업로드. ${accept} 파일 허용, 최대 크기 ${maxSize}MB`}
           className={`
             relative border-2 border-dashed rounded-lg p-8
             transition-colors duration-200
@@ -115,6 +118,7 @@ export default function FileUpload({
             className="hidden"
             accept={accept}
             onChange={handleFileInput}
+            aria-label={`파일 선택: ${accept} 파일 (최대 ${maxSize}MB)`}
           />
 
           <label
@@ -125,6 +129,7 @@ export default function FileUpload({
               className={`w-16 h-16 mb-4 ${
                 isDragging ? 'text-primary-500' : 'text-gray-400 dark:text-gray-500'
               }`}
+              aria-hidden="true"
             />
             <p className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
               {isDragging ? '파일을 여기에 놓으세요' : '파일을 드래그하거나 클릭하여 업로드'}
@@ -135,10 +140,14 @@ export default function FileUpload({
           </label>
         </div>
       ) : (
-        <div className="border border-gray-300 dark:border-dark-border rounded-lg p-6 bg-white dark:bg-dark-surface">
+        <div
+          className="border border-gray-300 dark:border-dark-border rounded-lg p-6 bg-white dark:bg-dark-surface"
+          role="status"
+          aria-label="선택된 파일"
+        >
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <DocumentIcon className="w-12 h-12 text-primary-500" />
+              <DocumentIcon className="w-12 h-12 text-primary-500" aria-hidden="true" />
               <div>
                 <p className="font-medium text-gray-900 dark:text-gray-100">{selectedFile.name}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">{formatFileSize(selectedFile.size)}</p>
@@ -147,15 +156,20 @@ export default function FileUpload({
             <button
               onClick={handleRemoveFile}
               className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+              aria-label={`파일 제거: ${selectedFile.name}`}
             >
-              <XMarkIcon className="w-6 h-6" />
+              <XMarkIcon className="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+        <div
+          className="mt-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md"
+          role="alert"
+          aria-live="assertive"
+        >
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
         </div>
       )}

@@ -2,7 +2,6 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useLocale, useTranslations } from 'next-intl'
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -26,17 +25,24 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
-  const locale = useLocale()
-  const t = useTranslations('common')
 
   const navigation: NavItem[] = [
-    { key: 'dashboard', href: `/${locale}/dashboard`, icon: HomeIcon },
-    { key: 'documents', href: `/${locale}/documents`, icon: DocumentTextIcon },
-    { key: 'query', href: `/${locale}/query`, icon: ChatBubbleLeftRightIcon },
-    { key: 'graph', href: `/${locale}/graph`, icon: CircleStackIcon },
-    { key: 'customers', href: `/${locale}/customers`, icon: UsersIcon },
-    { key: 'settings', href: `/${locale}/settings`, icon: Cog6ToothIcon },
+    { key: 'dashboard', href: `/dashboard`, icon: HomeIcon },
+    { key: 'documents', href: `/documents`, icon: DocumentTextIcon },
+    { key: 'query', href: `/query`, icon: ChatBubbleLeftRightIcon },
+    { key: 'graph', href: `/graph`, icon: CircleStackIcon },
+    { key: 'customers', href: `/customers`, icon: UsersIcon },
+    { key: 'settings', href: `/settings`, icon: Cog6ToothIcon },
   ]
+
+  const labels: Record<string, string> = {
+    dashboard: '{`${labels[item.key]}`}',
+    documents: '문서 관리',
+    query: '질의응답',
+    graph: '그래프',
+    customers: '고객 관리',
+    settings: '설정',
+  }
 
   return (
     <>
@@ -60,9 +66,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-dark-border">
-            <Link href={`/${locale}/dashboard`} className="flex items-center">
+            <Link href={`/dashboard`} className="flex items-center">
               <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
-                {t('appName')}
+                InsureGraph Pro
               </span>
             </Link>
             <button

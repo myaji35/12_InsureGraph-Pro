@@ -68,52 +68,73 @@ export default function GraphControls({
   }
 
   return (
-    <div className="card">
+    <div className="card" role="region" aria-label="그래프 필터 컨트롤">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <FunnelIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+          <FunnelIcon className="w-5 h-5 text-gray-600 dark:text-gray-400" aria-hidden="true" />
           <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">필터</h3>
         </div>
         <button
           onClick={() => setIsExpanded(!isExpanded)}
           className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 font-medium"
+          aria-expanded={isExpanded}
+          aria-controls="filter-content"
+          aria-label={isExpanded ? '필터 접기' : '필터 펼치기'}
         >
           {isExpanded ? '접기' : '펼치기'}
         </button>
       </div>
 
       {isExpanded && (
-        <div className="space-y-6">
+        <div className="space-y-6" id="filter-content">
           {/* Search */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <div role="search">
+            <label
+              htmlFor="node-search"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
               노드 검색
             </label>
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <MagnifyingGlassIcon
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500"
+                aria-hidden="true"
+              />
               <input
+                id="node-search"
                 type="text"
                 placeholder="노드 이름으로 검색..."
                 className="input-field pl-10"
                 value={searchQuery}
                 onChange={(e) => onSearchQueryChange(e.target.value)}
+                aria-label="노드 이름 검색"
               />
             </div>
           </div>
 
           {/* Node Types */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <fieldset>
+            <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               노드 유형 ({selectedNodeTypes.length}개 선택)
-            </label>
-            <div className="space-y-2">
+            </legend>
+            <div className="space-y-2" role="group" aria-label="노드 유형 선택">
               {nodeTypeOptions.map((option) => {
                 const isSelected = selectedNodeTypes.includes(option.value)
                 return (
                   <div
                     key={option.value}
+                    role="checkbox"
+                    tabIndex={0}
+                    aria-checked={isSelected}
+                    aria-label={`${option.label} 노드 유형`}
                     onClick={() => handleToggleNodeType(option.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleToggleNodeType(option.value)
+                      }
+                    }}
                     className={`
                       flex items-center gap-3 p-3 rounded-lg border cursor-pointer
                       transition-colors duration-150
@@ -133,6 +154,7 @@ export default function GraphControls({
                             : 'bg-white dark:bg-dark-surface border-gray-300 dark:border-dark-border'
                         }
                       `}
+                      aria-hidden="true"
                     >
                       {isSelected && <CheckIcon className="w-3 h-3 text-white" />}
                     </div>
@@ -141,20 +163,30 @@ export default function GraphControls({
                 )
               })}
             </div>
-          </div>
+          </fieldset>
 
           {/* Documents */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+          <fieldset>
+            <legend className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               문서 ({selectedDocumentIds.length}개 선택)
-            </label>
-            <div className="max-h-60 overflow-y-auto space-y-2">
+            </legend>
+            <div className="max-h-60 overflow-y-auto space-y-2" role="group" aria-label="문서 선택">
               {documents.map((doc) => {
                 const isSelected = selectedDocumentIds.includes(doc.document_id)
                 return (
                   <div
                     key={doc.document_id}
+                    role="checkbox"
+                    tabIndex={0}
+                    aria-checked={isSelected}
+                    aria-label={`${doc.product_name} - ${doc.insurer}`}
                     onClick={() => handleToggleDocument(doc.document_id)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleToggleDocument(doc.document_id)
+                      }
+                    }}
                     className={`
                       flex items-start gap-3 p-3 rounded-lg border cursor-pointer
                       transition-colors duration-150
@@ -174,6 +206,7 @@ export default function GraphControls({
                             : 'bg-white dark:bg-dark-surface border-gray-300 dark:border-dark-border'
                         }
                       `}
+                      aria-hidden="true"
                     >
                       {isSelected && <CheckIcon className="w-3 h-3 text-white" />}
                     </div>
@@ -187,13 +220,15 @@ export default function GraphControls({
                 )
               })}
             </div>
-          </div>
+          </fieldset>
 
           {/* Apply Button */}
           <button
             onClick={onApplyFilters}
             className="btn-primary w-full"
             disabled={selectedDocumentIds.length === 0}
+            aria-label={`선택된 ${selectedDocumentIds.length}개 문서로 그래프 생성`}
+            aria-disabled={selectedDocumentIds.length === 0}
           >
             그래프 생성
           </button>

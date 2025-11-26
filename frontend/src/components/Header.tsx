@@ -11,9 +11,7 @@ import {
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline'
 import { useUser, useClerk } from '@clerk/nextjs'
-import { useTranslations } from 'next-intl'
 import { ThemeToggle } from './ThemeToggle'
-import { LanguageSwitcher } from './LanguageSwitcher'
 
 interface HeaderProps {
   onMenuClick: () => void
@@ -23,7 +21,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const router = useRouter()
   const { user } = useUser()
   const { signOut } = useClerk()
-  const t = useTranslations('common')
 
   const handleLogout = async () => {
     await signOut()
@@ -53,9 +50,6 @@ export default function Header({ onMenuClick }: HeaderProps) {
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* Language Switcher */}
-          <LanguageSwitcher />
-
           {/* Notifications */}
           <button className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-hover relative">
             <BellIcon className="w-6 h-6" />
@@ -69,7 +63,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <UserCircleIcon className="w-8 h-8 text-gray-400 dark:text-gray-500" />
               <div className="hidden md:block text-left">
                 <div className="text-sm font-medium">{user?.firstName || user?.emailAddresses[0]?.emailAddress}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">{t('user')}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">사용자</div>
               </div>
             </Menu.Button>
 
@@ -85,7 +79,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white dark:bg-dark-surface rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 focus:outline-none">
                 <div className="p-4 border-b border-gray-100 dark:border-dark-border">
                   <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                    {user?.firstName || t('user')}
+                    {user?.firstName || '사용자'}
                   </div>
                   <div className="text-xs text-gray-500 dark:text-gray-400">
                     {user?.emailAddresses[0]?.emailAddress}
@@ -103,7 +97,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                         `}
                       >
                         <UserCircleIcon className="w-5 h-5 mr-3 text-gray-400 dark:text-gray-500" />
-                        {t('profile')}
+                        프로필
                       </button>
                     )}
                   </Menu.Item>
@@ -118,7 +112,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                         `}
                       >
                         <Cog6ToothIcon className="w-5 h-5 mr-3 text-gray-400 dark:text-gray-500" />
-                        {t('settings')}
+                        설정
                       </button>
                     )}
                   </Menu.Item>
@@ -135,7 +129,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                         `}
                       >
                         <ArrowRightOnRectangleIcon className="w-5 h-5 mr-3" />
-                        {t('logout')}
+                        로그아웃
                       </button>
                     )}
                   </Menu.Item>
