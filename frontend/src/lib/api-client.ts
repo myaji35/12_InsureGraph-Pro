@@ -205,15 +205,20 @@ class APIClient {
     description?: string
     confidence: number
   }> {
-    const formData = new FormData()
-    formData.append('file', file)
-
-    const response = await this.client.post('/documents/extract-metadata', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+    // TODO: Implement actual OCR/metadata extraction endpoint
+    // For now, return default values that user can edit
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve({
+          insurer: '',
+          product_name: file.name.replace(/\.[^/.]+$/, ''),
+          product_code: '',
+          launch_date: '',
+          description: '',
+          confidence: 0,
+        })
+      }, 500) // Simulate network delay
     })
-    return response.data
   }
 
   async uploadDocument(file: File, metadata: {
