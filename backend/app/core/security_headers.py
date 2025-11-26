@@ -46,11 +46,11 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
 
         # 보안 헤더 추가
-        self._add_security_headers(response)
+        self._add_security_headers(request, response)
 
         return response
 
-    def _add_security_headers(self, response: Response):
+    def _add_security_headers(self, request: Request, response: Response):
         """
         응답에 보안 헤더를 추가합니다.
         """
