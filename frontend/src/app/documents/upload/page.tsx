@@ -22,7 +22,7 @@ export default function DocumentUploadPage() {
     product_code: '',
     launch_date: '',
     description: '',
-    document_type: 'terms',
+    document_type: 'insurance_policy',
     tags: '',
   })
 
@@ -465,9 +465,10 @@ export default function DocumentUploadPage() {
                   value={metadata.document_type}
                   onChange={handleInputChange}
                 >
-                  <option value="terms">약관</option>
-                  <option value="brochure">상품 안내장</option>
-                  <option value="guide">가입 설계서</option>
+                  <option value="insurance_policy">보험 약관</option>
+                  <option value="terms_conditions">약관</option>
+                  <option value="certificate">증권</option>
+                  <option value="claim_form">청구서</option>
                   <option value="other">기타</option>
                 </select>
               </div>
