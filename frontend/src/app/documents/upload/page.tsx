@@ -320,16 +320,55 @@ export default function DocumentUploadPage() {
                 <label htmlFor="insurer" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   보험사 *
                 </label>
-                <input
-                  type="text"
+                <select
                   id="insurer"
                   name="insurer"
                   required
                   className="input-field"
-                  placeholder="예: 삼성화재, 현대해상"
                   value={metadata.insurer}
                   onChange={handleInputChange}
-                />
+                >
+                  <option value="">보험사를 선택하세요</option>
+                  <optgroup label="생명보험">
+                    <option value="삼성생명">삼성생명</option>
+                    <option value="한화생명">한화생명</option>
+                    <option value="교보생명">교보생명</option>
+                    <option value="KB생명">KB생명</option>
+                    <option value="신한라이프">신한라이프</option>
+                    <option value="메리츠생명">메리츠생명</option>
+                    <option value="현대라이프">현대라이프</option>
+                    <option value="DB생명">DB생명</option>
+                    <option value="AIA생명">AIA생명</option>
+                    <option value="흥국생명">흥국생명</option>
+                    <option value="NH농협생명">NH농협생명</option>
+                    <option value="하나생명">하나생명</option>
+                    <option value="푸르덴셜생명">푸르덴셜생명</option>
+                    <option value="라이나생명">라이나생명</option>
+                    <option value="오렌지라이프">오렌지라이프</option>
+                    <option value="DGB생명">DGB생명</option>
+                    <option value="IBK연금보험">IBK연금보험</option>
+                    <option value="KDB생명">KDB생명</option>
+                    <option value="BNP파리바카디프생명">BNP파리바카디프생명</option>
+                    <option value="ABL생명">ABL생명</option>
+                  </optgroup>
+                  <optgroup label="손해보험">
+                    <option value="삼성화재">삼성화재</option>
+                    <option value="현대해상">현대해상</option>
+                    <option value="DB손해보험">DB손해보험</option>
+                    <option value="KB손해보험">KB손해보험</option>
+                    <option value="메리츠화재">메리츠화재</option>
+                    <option value="한화손해보험">한화손해보험</option>
+                    <option value="흥국화재">흥국화재</option>
+                    <option value="NH농협손해보험">NH농협손해보험</option>
+                    <option value="하나손해보험">하나손해보험</option>
+                    <option value="롯데손해보험">롯데손해보험</option>
+                    <option value="MG손해보험">MG손해보험</option>
+                    <option value="캐롯손해보험">캐롯손해보험</option>
+                  </optgroup>
+                  <optgroup label="기타">
+                    <option value="기타">기타</option>
+                  </optgroup>
+                </select>
               </div>
 
               {/* Product Name */}
