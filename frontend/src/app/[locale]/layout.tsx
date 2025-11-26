@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { locales } from '@/i18n'
 import { ClerkProvider } from '@clerk/nextjs'
 import { ThemeProvider } from '@/providers/theme-provider'
-import { Toaster } from 'react-hot-toast'
+import { Toaster } from '@/lib/toast-config'
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }))

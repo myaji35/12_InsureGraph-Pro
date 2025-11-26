@@ -9,6 +9,8 @@ import type {
   Document,
   PaginatedResponse,
 } from '@/types'
+import { showError } from './toast-config'
+import { getErrorMessage, getErrorMessageFromStatus } from './error-messages'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || 'v1'
@@ -60,7 +62,7 @@ class APIClient {
     // Response interceptor
     this.client.interceptors.response.use(
       (response) => response,
-      async (error: AxiosError) => {
+      async (error: AxiosError<{ error_code?: string; message?: string; detail?: string }>) => {
         const originalRequest = error.config as any
 
         // Network error - 백엔드 서버가 없는 경우
@@ -72,17 +74,22 @@ class APIClient {
             console.warn(`   요청 URL: ${error.config?.url}`)
             console.warn(`   해결: 1) 백엔드 서버 시작 또는 2) Clerk 인증 사용`)
             console.warn(`   Clerk를 사용하면 백엔드 없이 개발 가능합니다.`)
-
-            // 개발 모드에서는 mock 데이터로 fallback (optional)
-            // return { data: {}, status: 200 }
+          } else {
+            // Production: Show user-friendly error
+            showError(getErrorMessage('NETWORK_ERROR'))
           }
 
           // 에러 그대로 전달 (호출한 곳에서 처리)
           return Promise.reject(error)
         }
 
+        // Get error information from response
+        const status = error.response.status
+        const errorCode = error.response.data?.error_code
+        const errorMessage = error.response.data?.message || error.response.data?.detail
+
         // If 401 and not already retried, try to refresh token
-        if (error.response?.status === 401 && !originalRequest._retry) {
+        if (status === 401 && !originalRequest._retry) {
           originalRequest._retry = true
 
           try {
@@ -100,15 +107,34 @@ class APIClient {
               // Retry original request
               originalRequest.headers.Authorization = `Bearer ${access_token}`
               return this.client(originalRequest)
+            } else {
+              // No refresh token, show error and redirect
+              showError(getErrorMessage('UNAUTHORIZED'))
+              if (typeof window !== 'undefined') {
+                window.location.href = '/sign-in'
+              }
             }
           } catch (refreshError) {
             // Refresh failed, redirect to login
             if (typeof window !== 'undefined') {
               localStorage.removeItem('access_token')
               localStorage.removeItem('refresh_token')
-              window.location.href = '/sign-in'  // Clerk sign-in으로 변경
+              showError(getErrorMessage('TOKEN_EXPIRED'))
+              window.location.href = '/sign-in'
             }
             return Promise.reject(refreshError)
+          }
+        }
+
+        // Handle other error statuses
+        if (status !== 401) {
+          // Priority: errorMessage from server > errorCode mapping > status code mapping
+          const message = errorMessage || getErrorMessage(errorCode) || getErrorMessageFromStatus(status)
+
+          // Don't show toast for some specific errors (let component handle it)
+          const silentErrors = [404] // e.g., Not Found might be handled by component
+          if (!silentErrors.includes(status)) {
+            showError(message)
           }
         }
 
