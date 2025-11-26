@@ -42,6 +42,7 @@ class Settings(BaseSettings):
     GCS_BUCKET_POLICIES: str
     GCS_BUCKET_REPORTS: str
     GOOGLE_APPLICATION_CREDENTIALS: str
+    CLOUD_SQL_CONNECTION_NAME: str = ""
 
     # KMS
     KMS_KEY_NAME: str

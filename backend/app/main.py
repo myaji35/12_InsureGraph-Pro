@@ -24,23 +24,49 @@ async def lifespan(app: FastAPI):
     print(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     print(f"📍 Environment: {settings.ENVIRONMENT}")
 
+    # Try to connect to databases, but don't fail if they're not available
+    pg_connected = False
+    neo4j_connected = False
+    redis_connected = False
+
     try:
         pg_manager.connect()
-        await neo4j_manager.connect()
-        redis_manager.connect()
-        print("✅ All database connections established")
+        pg_connected = True
+        print("✅ PostgreSQL connected")
     except Exception as e:
-        print(f"❌ Database connection failed: {e}")
-        raise
+        print(f"⚠️  PostgreSQL connection failed: {e}")
+
+    try:
+        await neo4j_manager.connect()
+        neo4j_connected = True
+        print("✅ Neo4j connected")
+    except Exception as e:
+        print(f"⚠️  Neo4j connection failed: {e}")
+
+    try:
+        redis_manager.connect()
+        redis_connected = True
+        print("✅ Redis connected")
+    except Exception as e:
+        print(f"⚠️  Redis connection failed: {e}")
+
+    if not (pg_connected or neo4j_connected or redis_connected):
+        print("⚠️  No database connections established - running in limited mode")
 
     yield
 
     # Shutdown: Close database connections
     print("🛑 Shutting down...")
-    pg_manager.disconnect()
-    await neo4j_manager.disconnect()
-    redis_manager.disconnect()
-    print("✅ All connections closed")
+    try:
+        if pg_connected:
+            pg_manager.disconnect()
+        if neo4j_connected:
+            await neo4j_manager.disconnect()
+        if redis_connected:
+            redis_manager.disconnect()
+        print("✅ All connections closed")
+    except Exception as e:
+        print(f"⚠️  Error closing connections: {e}")
 
 
 # FastAPI app instance
