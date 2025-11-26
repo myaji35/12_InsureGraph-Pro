@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { locales } from '@/i18n'
 import { ClerkProvider } from '@clerk/nextjs'
 import { ThemeProvider } from '@/providers/theme-provider'
+import { QueryProvider } from '@/providers/query-provider'
 import { Toaster } from '@/lib/toast-config'
 
 export function generateStaticParams() {
@@ -28,15 +29,17 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       <ClerkProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {children}
-          <Toaster />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </QueryProvider>
       </ClerkProvider>
     </NextIntlClientProvider>
   )
