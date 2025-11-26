@@ -171,10 +171,31 @@ export default function DocumentUploadPage() {
         router.push('/documents')
       }, 2000)
     } catch (err: any) {
-      const errorMessage =
-        err.response?.data?.detail?.error_message ||
-        err.message ||
-        '문서 업로드에 실패했습니다.'
+      // Handle various error response formats
+      let errorMessage = '문서 업로드에 실패했습니다.'
+
+      if (err.response?.data) {
+        const data = err.response.data
+        // Check if detail is a string
+        if (typeof data.detail === 'string') {
+          errorMessage = data.detail
+        }
+        // Check if detail is an object with error_message
+        else if (data.detail?.error_message) {
+          errorMessage = data.detail.error_message
+        }
+        // Check for direct error_message
+        else if (data.error_message) {
+          errorMessage = data.error_message
+        }
+        // Check for direct message
+        else if (data.message) {
+          errorMessage = data.message
+        }
+      } else if (err.message) {
+        errorMessage = err.message
+      }
+
       setError(errorMessage)
     } finally {
       setIsUploading(false)
@@ -336,6 +357,7 @@ export default function DocumentUploadPage() {
                     <option value="KB생명">KB생명</option>
                     <option value="신한라이프">신한라이프</option>
                     <option value="메리츠생명">메리츠생명</option>
+                    <option value="메트라이프생명">메트라이프생명</option>
                     <option value="현대라이프">현대라이프</option>
                     <option value="DB생명">DB생명</option>
                     <option value="AIA생명">AIA생명</option>
