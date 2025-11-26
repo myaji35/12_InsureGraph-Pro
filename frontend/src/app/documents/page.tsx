@@ -59,7 +59,7 @@ export default function DocumentsPage() {
     )
   }
 
-  const filteredDocuments = documents.filter((doc) => {
+  const filteredDocuments = (documents || []).filter((doc) => {
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       return (
