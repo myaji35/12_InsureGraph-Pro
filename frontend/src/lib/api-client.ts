@@ -7,6 +7,7 @@ import type {
   QueryRequest,
   QueryResponse,
   Document,
+  DocumentListResponse,
   PaginatedResponse,
 } from '@/types'
 import { showError } from './toast-config'
@@ -320,8 +321,8 @@ class APIClient {
     status?: string
     page?: number
     page_size?: number
-  }): Promise<PaginatedResponse<Document>> {
-    const response = await this.client.get<PaginatedResponse<Document>>(
+  }): Promise<DocumentListResponse> {
+    const response = await this.client.get<DocumentListResponse>(
       '/documents',
       { params }
     )

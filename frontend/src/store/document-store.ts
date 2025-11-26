@@ -43,14 +43,14 @@ export const useDocumentStore = create<DocumentState>()((set, get) => ({
       const response = await apiClient.getDocuments(params)
 
       set({
-        documents: response.items,
+        documents: response.documents,
         pagination: {
           page: response.page,
           page_size: response.page_size,
           total_pages: response.total_pages,
-          total_items: response.total_items,
-          has_next: response.has_next,
-          has_prev: response.has_prev,
+          total_items: response.total,
+          has_next: response.page < response.total_pages,
+          has_prev: response.page > 1,
         },
         isLoading: false,
       })

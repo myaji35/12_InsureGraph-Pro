@@ -75,6 +75,14 @@ export interface Document {
   uploaded_by_user_id?: string
 }
 
+export interface DocumentListResponse {
+  documents: Document[]
+  total: number
+  page: number
+  page_size: number
+  total_pages: number
+}
+
 /**
  * Query Types
  */
