@@ -115,12 +115,50 @@ async def upload_document(
     # Reset file pointer
     await file.seek(0)
 
+    # 3. Calculate file hash for duplicate detection
+    file_hash = hashlib.sha256(file_content).hexdigest()
+
+    # 4. Check for duplicate files
+    for existing_doc in _documents.values():
+        # Check by file content hash
+        if hasattr(existing_doc, 'file_hash') and existing_doc.file_hash == file_hash:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error_code": "DUPLICATE_FILE",
+                    "error_message": f"동일한 파일이 이미 업로드되어 있습니다: {existing_doc.product_name}",
+                    "details": {
+                        "existing_document_id": str(existing_doc.document_id),
+                        "existing_product_name": existing_doc.product_name,
+                        "existing_insurer": existing_doc.insurer
+                    }
+                }
+            )
+
+        # Check by insurer + product_name + product_code combination
+        if (existing_doc.insurer == insurer and
+            existing_doc.product_name == product_name and
+            existing_doc.product_code == product_code and
+            product_code is not None):
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail={
+                    "error_code": "DUPLICATE_PRODUCT",
+                    "error_message": f"동일한 상품이 이미 등록되어 있습니다: {insurer} - {product_name} ({product_code})",
+                    "details": {
+                        "existing_document_id": str(existing_doc.document_id),
+                        "existing_product_name": existing_doc.product_name,
+                        "existing_product_code": existing_doc.product_code
+                    }
+                }
+            )
+
     try:
-        # 3. Generate IDs
+        # 5. Generate IDs
         document_id = uuid4()
         job_id = uuid4()
 
-        # 4. Parse tags
+        # 6. Parse tags
         tag_list = []
         if tags:
             tag_list = [t.strip() for t in tags.split(",") if t.strip()]
@@ -145,6 +183,7 @@ async def upload_document(
             filename=file.filename or "unknown.pdf",
             file_size_bytes=file_size_bytes,
             content_type=file.content_type or "application/pdf",
+            file_hash=file_hash,
             status=DocumentStatus.PROCESSING,
             total_pages=None,  # Will be set after OCR
             total_articles=None,  # Will be set after parsing

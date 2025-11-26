@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { use } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useDocumentStore } from '@/store/document-store'
 import {
@@ -16,8 +15,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { formatDate, formatDateTime } from '@/lib/utils'
 
-export default function DocumentDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params)
+export default function DocumentDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const { currentDocument, isLoading, fetchDocument, deleteDocument } = useDocumentStore()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -25,11 +23,11 @@ export default function DocumentDetailPage({ params }: { params: Promise<{ id: s
 
   useEffect(() => {
     loadDocument()
-  }, [resolvedParams.id])
+  }, [params.id])
 
   const loadDocument = async () => {
     try {
-      await fetchDocument(resolvedParams.id)
+      await fetchDocument(params.id)
     } catch (error) {
       console.error('Failed to load document:', error)
     }
