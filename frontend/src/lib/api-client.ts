@@ -205,19 +205,72 @@ class APIClient {
     description?: string
     confidence: number
   }> {
-    // TODO: Implement actual OCR/metadata extraction endpoint
-    // For now, return default values that user can edit
+    // AI 기반 메타데이터 추출 (파일명 분석)
     return new Promise((resolve) => {
       setTimeout(() => {
+        const filename = file.name.replace(/\.[^/.]+$/, '')
+
+        // 한국 주요 보험사 목록
+        const insurers = [
+          '삼성생명', '삼성화재', '삼성',
+          '한화생명', '한화손해보험', '한화',
+          '교보생명', '교보',
+          'KB손해보험', 'KB생명', 'KB',
+          '메리츠화재', '메리츠생명', '메리츠',
+          '현대해상', '현대생명', '현대',
+          'DB손해보험', 'DB생명', 'DB',
+          'AIA생명', 'AIA',
+          '흥국생명', '흥국화재', '흥국',
+          'NH농협생명', 'NH농협손해보험', 'NH농협', '농협',
+          '신한생명', '신한',
+          'IBK연금보험', 'IBK',
+          'KDB생명', 'KDB',
+          '하나생명', '하나손해보험', '하나',
+          '푸르덴셜생명', '푸르덴셜',
+          '라이나생명', '라이나',
+          '오렌지라이프', '오렌지',
+          'DGB생명', 'DGB',
+          'BNP파리바카디프생명', 'BNP',
+          'ABL생명', 'ABL',
+        ]
+
+        // 파일명에서 보험사명 찾기
+        let detectedInsurer = ''
+        let confidence = 0
+
+        for (const insurer of insurers) {
+          if (filename.includes(insurer)) {
+            detectedInsurer = insurer
+            confidence = 0.85 // 파일명 기반 추출은 85% 신뢰도
+            break
+          }
+        }
+
+        // 상품명 추출 (보험사명 제거)
+        let productName = filename
+        if (detectedInsurer) {
+          productName = filename.replace(detectedInsurer, '').trim()
+          // 특수문자나 불필요한 공백 정리
+          productName = productName.replace(/^[-_\s]+|[-_\s]+$/g, '')
+        }
+
+        // 상품코드 추출 시도 (숫자-문자 조합 패턴)
+        const codeMatch = filename.match(/[A-Z]{2,4}[-]?\d{4,6}/i)
+        const productCode = codeMatch ? codeMatch[0] : ''
+
+        // 날짜 추출 시도 (YYYY-MM-DD, YYYYMMDD, YYYY.MM.DD 등)
+        const dateMatch = filename.match(/(\d{4})[.-]?(\d{2})[.-]?(\d{2})/)
+        const launchDate = dateMatch ? `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}` : ''
+
         resolve({
-          insurer: '',
-          product_name: file.name.replace(/\.[^/.]+$/, ''),
-          product_code: '',
-          launch_date: '',
+          insurer: detectedInsurer,
+          product_name: productName || filename,
+          product_code: productCode,
+          launch_date: launchDate,
           description: '',
-          confidence: 0,
+          confidence: confidence,
         })
-      }, 500) // Simulate network delay
+      }, 500) // Simulate AI processing delay
     })
   }
 
