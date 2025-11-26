@@ -86,7 +86,24 @@ class APIClient {
         // Get error information from response
         const status = error.response.status
         const errorCode = error.response.data?.error_code
-        const errorMessage = error.response.data?.message || error.response.data?.detail
+
+        // Extract error message, handling both string and object formats
+        let errorMessage: string | undefined
+        const responseData = error.response.data
+        if (responseData) {
+          // Check if detail is an object with error_message
+          if (typeof responseData.detail === 'object' && responseData.detail?.error_message) {
+            errorMessage = responseData.detail.error_message
+          }
+          // Check if detail is a string
+          else if (typeof responseData.detail === 'string') {
+            errorMessage = responseData.detail
+          }
+          // Check for direct message field
+          else if (responseData.message) {
+            errorMessage = responseData.message
+          }
+        }
 
         // If 401 and not already retried, try to refresh token
         if (status === 401 && !originalRequest._retry) {
