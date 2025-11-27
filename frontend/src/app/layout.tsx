@@ -5,8 +5,12 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { ThemeProvider } from '@/providers/theme-provider'
 import { QueryProvider } from '@/providers/query-provider'
 import { Toaster } from '@/lib/toast-config'
+import { CyberParticles } from '@/components/CyberParticles'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+
+// Force dynamic rendering - skip static generation at build time
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'InsureGraph Pro - FP Workspace',
@@ -24,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={inter.variable}>
+        <CyberParticles />
         <ClerkProvider>
           <QueryProvider>
             <ThemeProvider

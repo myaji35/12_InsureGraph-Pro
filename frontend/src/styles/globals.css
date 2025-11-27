@@ -4,30 +4,182 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100;
+    @apply bg-gray-50 dark:bg-cyber-bg-dark text-gray-900 dark:text-gray-100;
+    position: relative;
   }
 
-  /* Dark mode color scheme */
+  /* Cybernetic grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+      linear-gradient(rgba(6, 182, 212, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(6, 182, 212, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+    animation: grid-pulse 4s ease-in-out infinite;
+  }
+
+  /* Scanning line effect */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(34, 211, 238, 0.5) 50%,
+      transparent 100%
+    );
+    pointer-events: none;
+    z-index: 1;
+    animation: scan-line 8s linear infinite;
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.8);
+  }
+
+  /* Dark mode color scheme - Cybernetic theme */
   .dark {
     color-scheme: dark;
+    --background: 210 100% 4%;
+    --foreground: 0 0% 98%;
+    --card: 210 100% 6%;
+    --card-foreground: 0 0% 98%;
+    --popover: 210 100% 4%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 189 100% 42%;
+    --primary-foreground: 0 0% 9%;
+    --secondary: 210 40% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 210 40% 12%;
+    --muted-foreground: 0 0% 63.9%;
+    --accent: 189 100% 42%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 189 50% 15%;
+    --input: 189 50% 15%;
+    --ring: 189 100% 42%;
+    --chart-1: 189 100% 42%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 0 0% 3.9%;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --radius: 0.5rem;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 dark:bg-primary-700 dark:hover:bg-primary-600 transition-colors;
+    @apply bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 dark:bg-cyber-cyan dark:hover:bg-cyber-cyan-600 transition-all duration-300 dark:shadow-cyber;
   }
 
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-dark-elevated dark:text-gray-300 dark:hover:bg-dark-hover transition-colors;
+    @apply bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 dark:bg-cyber-bg-elevated dark:text-cyber-cyan-300 dark:hover:bg-cyber-bg-elevated dark:border dark:border-cyber-cyan-700 transition-all duration-300;
   }
 
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 dark:border-dark-border bg-white dark:bg-dark-surface text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400;
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-cyber-cyan-800 bg-white dark:bg-cyber-bg-surface text-gray-900 dark:text-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-cyber-cyan dark:focus:shadow-cyber transition-all duration-300;
   }
 
   .card {
-    @apply bg-white dark:bg-dark-surface rounded-lg shadow-md dark:shadow-xl p-6 border border-transparent dark:border-dark-border;
+    @apply bg-white dark:bg-cyber-bg-surface rounded-lg shadow-md dark:shadow-cyber p-6 border border-transparent dark:border-cyber-cyan-900 relative z-10;
+  }
+
+  /* Cybernetic card with glow effect */
+  .cyber-card {
+    @apply bg-white dark:bg-cyber-bg-surface rounded-lg p-6 border border-gray-200 dark:border-cyber-cyan-800 relative z-10 transition-all duration-300;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+
+  .cyber-card:hover {
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.3);
+    border-color: rgba(34, 211, 238, 0.5);
+  }
+
+  /* Animated stat card */
+  .stat-card {
+    @apply cyber-card;
+    overflow: hidden;
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(34, 211, 238, 0.8) 50%,
+      transparent 100%
+    );
+    animation: data-flow 3s linear infinite;
+  }
+
+  /* Data visualization number glow */
+  .cyber-number {
+    @apply text-cyber-cyan font-bold;
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+    animation: cyber-glow 2s ease-in-out infinite;
+  }
+
+  /* Progress bar with cybernetic style */
+  .cyber-progress {
+    @apply relative h-2 bg-cyber-bg-elevated rounded-full overflow-hidden;
+  }
+
+  .cyber-progress-bar {
+    @apply h-full bg-gradient-to-r from-cyber-cyan to-cyber-blue relative;
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+  }
+
+  .cyber-progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 50%,
+      transparent 100%
+    );
+    animation: data-flow 2s linear infinite;
   }
 
   /* Markdown prose styles */
