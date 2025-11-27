@@ -312,6 +312,36 @@ class DocumentStatsResponse(BaseModel):
         }
 
 
+class ProcessingJobStatus(BaseModel):
+    """문서 처리 작업 진행 상태"""
+    job_id: UUID = Field(..., description="작업 ID")
+    document_id: UUID = Field(..., description="문서 ID")
+    status: str = Field(..., description="작업 상태 (processing, completed, failed)")
+    current_step: Optional[str] = Field(None, description="현재 처리 중인 단계")
+    progress_percentage: int = Field(..., description="진행률 (0-100)")
+    steps_completed: List[str] = Field(default_factory=list, description="완료된 단계 목록")
+    error_message: Optional[str] = Field(None, description="에러 메시지 (실패 시)")
+    started_at: datetime = Field(..., description="작업 시작 시각")
+    updated_at: datetime = Field(..., description="마지막 업데이트 시각")
+    completed_at: Optional[datetime] = Field(None, description="작업 완료 시각")
+
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "job_id": "abc12345-e89b-12d3-a456-426614174000",
+                "document_id": "123e4567-e89b-12d3-a456-426614174000",
+                "status": "processing",
+                "current_step": "임베딩 생성 중",
+                "progress_percentage": 65,
+                "steps_completed": ["OCR 완료", "파싱 완료"],
+                "error_message": None,
+                "started_at": "2025-11-26T20:00:00",
+                "updated_at": "2025-11-26T20:02:30",
+                "completed_at": None
+            }
+        }
+
+
 # ============================================================================
 # Error Models
 # ============================================================================

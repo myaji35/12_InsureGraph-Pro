@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     REDIS_PASSWORD: str = ""
     REDIS_DB: int = 0
 
+    # Celery
+    CELERY_BROKER_URL: str = "redis://localhost:6379/1"
+    CELERY_RESULT_BACKEND: str = "redis://localhost:6379/2"
+
     # GCP
     GCP_PROJECT_ID: str
     GCS_BUCKET_POLICIES: str
@@ -50,6 +54,7 @@ class Settings(BaseSettings):
     # LLM APIs
     UPSTAGE_API_KEY: str
     OPENAI_API_KEY: str
+    ANTHROPIC_API_KEY: str
 
     # JWT
     JWT_SECRET_KEY: str

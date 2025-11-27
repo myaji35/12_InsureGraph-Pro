@@ -20,13 +20,25 @@ python-multipart==0.0.6
 
 # LLM and AI
 openai==1.10.0
+anthropic==0.18.1
 langchain==0.1.4
 langchain-openai==0.0.5
 langgraph==0.0.20
 
+# PDF Processing
+pdfplumber==0.11.0
+Pillow==10.2.0
+
 # HTTP client
 httpx==0.26.0
 aiohttp==3.9.1
+
+# Web Scraping (for crawler)
+beautifulsoup4==4.12.3
+lxml==5.1.0
+html5lib==1.1
+selenium==4.16.0
+webdriver-manager==4.0.1
 
 # Utilities
 python-dateutil==2.8.2

@@ -6,6 +6,7 @@ from typing import AsyncGenerator
 
 import psycopg2
 from psycopg2.pool import ThreadedConnectionPool
+from psycopg2.extras import register_uuid
 from neo4j import GraphDatabase, AsyncGraphDatabase
 from redis import Redis
 import asyncio
@@ -21,6 +22,10 @@ class PostgreSQLManager:
 
     def connect(self):
         """Initialize connection pool"""
+        # Register UUID adapter globally for psycopg2
+        # This allows psycopg2 to handle Python UUID objects correctly
+        register_uuid()
+
         self.pool = ThreadedConnectionPool(
             minconn=2,
             maxconn=10,

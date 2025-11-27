@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import {
   HomeIcon,
@@ -71,9 +72,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-dark-border">
             <Link href={`/dashboard`} className="flex items-center">
-              <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
-                InsureGraph Pro
-              </span>
+              <Image
+                src="/logo.png"
+                alt="InsureGraph Pro"
+                width={180}
+                height={60}
+                className="h-10 w-auto"
+                priority
+              />
             </Link>
             <button
               onClick={onClose}
