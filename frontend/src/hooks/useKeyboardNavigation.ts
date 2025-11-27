@@ -46,18 +46,10 @@ export function useKeyboardNavigation(
 
       for (const shortcut of shortcuts) {
         const keyMatches = event.key === shortcut.key
-        const ctrlMatches = shortcut.ctrlKey
-          ? event.ctrlKey
-          : !event.ctrlKey || event.ctrlKey === shortcut.ctrlKey
-        const altMatches = shortcut.altKey
-          ? event.altKey
-          : !event.altKey || event.altKey === shortcut.altKey
-        const shiftMatches = shortcut.shiftKey
-          ? event.shiftKey
-          : !event.shiftKey || event.shiftKey === shortcut.shiftKey
-        const metaMatches = shortcut.metaKey
-          ? event.metaKey
-          : !event.metaKey || event.metaKey === shortcut.metaKey
+        const ctrlMatches = shortcut.ctrlKey ? event.ctrlKey : !event.ctrlKey
+        const altMatches = shortcut.altKey ? event.altKey : !event.altKey
+        const shiftMatches = shortcut.shiftKey ? event.shiftKey : !event.shiftKey
+        const metaMatches = shortcut.metaKey ? event.metaKey : !event.metaKey
 
         if (
           keyMatches &&

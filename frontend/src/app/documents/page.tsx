@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { useDocumentStore } from '@/store/document-store'
+import { Progress } from '@/components/ui/progress'
 import {
   PlusIcon,
   MagnifyingGlassIcon,
@@ -24,10 +25,64 @@ export default function DocumentsPage() {
   const [filterStatus, setFilterStatus] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [viewMode, setViewMode] = useState<'list' | 'grouped'>('grouped') // 그룹 뷰가 기본
+  const [processingProgress, setProcessingProgress] = useState<Record<string, number>>({})
+  const [processingSteps, setProcessingSteps] = useState<Record<string, string>>({})
 
   useEffect(() => {
     loadDocuments()
   }, [currentPage, filterInsurer, filterStatus])
+
+  // 처리 중인 문서의 진행률 polling
+  useEffect(() => {
+    const processingDocs = documents?.filter(doc => doc.status === 'processing') || []
+
+    if (processingDocs.length === 0) {
+      // 처리 중인 문서가 없으면 진행률 초기화
+      setProcessingProgress({})
+      return
+    }
+
+    // 실제 API에서 진행률 가져오기
+    const fetchProgress = async () => {
+      const newProgress: Record<string, number> = {}
+      const newSteps: Record<string, string> = {}
+
+      await Promise.all(
+        processingDocs.map(async (doc) => {
+          try {
+            const response = await fetch(
+              `http://localhost:8000/api/v1/documents/${doc.document_id}/processing-status`
+            )
+
+            if (response.ok) {
+              const data = await response.json()
+              newProgress[doc.document_id] = data.progress_percentage || 0
+              newSteps[doc.document_id] = data.current_step || '처리 중...'
+            } else {
+              // API 오류시 기존 진행률 유지 또는 0
+              newProgress[doc.document_id] = processingProgress[doc.document_id] || 0
+              newSteps[doc.document_id] = processingSteps[doc.document_id] || '처리 중...'
+            }
+          } catch (error) {
+            console.error(`Failed to fetch progress for ${doc.document_id}:`, error)
+            newProgress[doc.document_id] = processingProgress[doc.document_id] || 0
+            newSteps[doc.document_id] = processingSteps[doc.document_id] || '처리 중...'
+          }
+        })
+      )
+
+      setProcessingProgress(newProgress)
+      setProcessingSteps(newSteps)
+    }
+
+    // 즉시 한 번 실행
+    fetchProgress()
+
+    // 3초마다 업데이트
+    const interval = setInterval(fetchProgress, 3000)
+
+    return () => clearInterval(interval)
+  }, [documents])
 
   const loadDocuments = async () => {
     try {
@@ -39,6 +94,32 @@ export default function DocumentsPage() {
       })
     } catch (error) {
       console.error('Failed to load documents:', error)
+    }
+  }
+
+  const handleStartProcessing = async (documentId: string) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8000/api/v1/documents/${documentId}/start-processing`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+
+      if (response.ok) {
+        // 문서 목록 다시 로드
+        await loadDocuments()
+        alert('문서 처리가 시작되었습니다!')
+      } else {
+        const error = await response.json()
+        alert(`처리 시작 실패: ${error.detail?.error_message || '알 수 없는 오류'}`)
+      }
+    } catch (error) {
+      console.error('Failed to start processing:', error)
+      alert('문서 처리 시작에 실패했습니다.')
     }
   }
 
@@ -246,34 +327,62 @@ export default function DocumentsPage() {
                         {typeDocs.map((doc) => (
                           <div
                             key={doc.document_id}
-                            className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-dark-hover hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                            className="p-3 rounded-lg bg-gray-50 dark:bg-dark-hover hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
                             onClick={() => router.push(`/documents/${doc.document_id}`)}
                           >
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <DocumentTextIcon className="w-6 h-6 text-primary-500 flex-shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                                    {doc.product_name}
-                                  </p>
-                                  {getStatusBadge(doc.status)}
-                                </div>
-                                <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                  {doc.product_code && <span>{doc.product_code}</span>}
-                                  {doc.launch_date && <span>출시: {formatDate(doc.launch_date)}</span>}
-                                  <span>업로드: {formatDate(doc.created_at)}</span>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3 flex-1 min-w-0">
+                                <DocumentTextIcon className="w-6 h-6 text-primary-500 flex-shrink-0" />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                                      {doc.product_name}
+                                    </p>
+                                    {getStatusBadge(doc.status)}
+                                    {(doc.status === 'pending' || doc.status === 'failed') && (
+                                      <button
+                                        className="text-xs bg-blue-600 hover:bg-blue-700 text-white px-2 py-1 rounded"
+                                        onClick={(e) => {
+                                          e.stopPropagation()
+                                          handleStartProcessing(doc.document_id)
+                                        }}
+                                      >
+                                        처리 시작
+                                      </button>
+                                    )}
+                                  </div>
+                                  <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {doc.product_code && <span>{doc.product_code}</span>}
+                                    {doc.launch_date && <span>출시: {formatDate(doc.launch_date)}</span>}
+                                    <span>업로드: {formatDate(doc.created_at)}</span>
+                                  </div>
                                 </div>
                               </div>
+                              <button
+                                className="text-primary-600 hover:text-primary-700 text-sm font-medium flex-shrink-0"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  router.push(`/documents/${doc.document_id}`)
+                                }}
+                              >
+                                보기 →
+                              </button>
                             </div>
-                            <button
-                              className="text-primary-600 hover:text-primary-700 text-sm font-medium flex-shrink-0"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                router.push(`/documents/${doc.document_id}`)
-                              }}
-                            >
-                              보기 →
-                            </button>
+
+                            {/* 처리 중인 문서에 프로그래스바 표시 */}
+                            {doc.status === 'processing' && (
+                              <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                                    {processingSteps[doc.document_id] || '처리 중...'}
+                                  </span>
+                                  <span className="text-xs font-medium text-gray-600 dark:text-gray-400">
+                                    {processingProgress[doc.document_id] || 0}%
+                                  </span>
+                                </div>
+                                <Progress value={processingProgress[doc.document_id] || 0} className="h-2" />
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -294,7 +403,7 @@ export default function DocumentsPage() {
                 className="card hover:shadow-lg transition-shadow cursor-pointer"
                 onClick={() => router.push(`/documents/${doc.document_id}`)}
               >
-                <div className="flex items-start justify-between">
+                <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start gap-4 flex-1">
                     <DocumentTextIcon className="w-12 h-12 text-primary-500 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -303,6 +412,17 @@ export default function DocumentsPage() {
                           {doc.product_name}
                         </h3>
                         {getStatusBadge(doc.status)}
+                        {(doc.status === 'pending' || doc.status === 'failed') && (
+                          <button
+                            className="text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              handleStartProcessing(doc.document_id)
+                            }}
+                          >
+                            처리 시작
+                          </button>
+                        )}
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{doc.insurer}</p>
                       <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
@@ -338,6 +458,24 @@ export default function DocumentsPage() {
                     자세히 보기 →
                   </button>
                 </div>
+
+                {/* 처리 중인 문서에 프로그래스바 표시 */}
+                {doc.status === 'processing' && (
+                  <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                        {processingSteps[doc.document_id] || '처리 중...'}
+                      </span>
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                        {processingProgress[doc.document_id] || 0}%
+                      </span>
+                    </div>
+                    <Progress value={processingProgress[doc.document_id] || 0} className="h-2.5" />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                      문서를 분석하고 지식 그래프를 생성하고 있습니다...
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>

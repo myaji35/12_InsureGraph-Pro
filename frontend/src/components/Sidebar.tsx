@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -9,6 +9,7 @@ import {
   UsersIcon,
   Cog6ToothIcon,
   CircleStackIcon,
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline'
 
 interface NavItem {
@@ -25,10 +26,12 @@ interface SidebarProps {
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
+  const router = useRouter()
 
   const navigation: NavItem[] = [
     { key: 'dashboard', href: `/dashboard`, icon: HomeIcon },
     { key: 'documents', href: `/documents`, icon: DocumentTextIcon },
+    { key: 'companies', href: `/companies`, icon: BuildingOfficeIcon },
     { key: 'query', href: `/query`, icon: ChatBubbleLeftRightIcon },
     { key: 'graph', href: `/graph`, icon: CircleStackIcon },
     { key: 'customers', href: `/customers`, icon: UsersIcon },
@@ -38,6 +41,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const labels: Record<string, string> = {
     dashboard: '대시보드',
     documents: '문서 관리',
+    companies: '보험사 관리',
     query: '질의응답',
     graph: '그래프',
     customers: '고객 관리',
@@ -101,6 +105,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 <Link
                   key={item.key}
                   href={item.href}
+                  prefetch={true}
                   className={`
                     flex items-center px-4 py-3 text-sm font-medium rounded-lg
                     transition-colors duration-150
@@ -110,6 +115,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-dark-hover hover:text-gray-900 dark:hover:text-gray-100'
                     }
                   `}
+                  onMouseEnter={() => {
+                    // Prefetch on hover for instant navigation
+                    router.prefetch(item.href)
+                  }}
                   onClick={() => {
                     // Close sidebar on mobile after navigation
                     if (window.innerWidth < 1024) {

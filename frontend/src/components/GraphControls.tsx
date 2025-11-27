@@ -45,7 +45,7 @@ export default function GraphControls({
 
   const loadDocuments = async () => {
     try {
-      await fetchDocuments({ status: 'ready', page_size: 100 })
+      await fetchDocuments({ status: 'completed', page_size: 100 })
     } catch (error) {
       console.error('Failed to load documents:', error)
     }

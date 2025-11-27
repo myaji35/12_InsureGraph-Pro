@@ -197,7 +197,17 @@ export interface PortfolioAnalysis {
 /**
  * Graph Types
  */
-export type NodeType = 'document' | 'entity' | 'concept' | 'clause'
+// 백엔드 Neo4j 노드 타입 + 호환성을 위한 기존 타입
+export type NodeType =
+  | 'product'    // 보험 상품
+  | 'coverage'   // 보장
+  | 'disease'    // 질병
+  | 'condition'  // 조건
+  | 'clause'     // 조항
+  | 'document'   // 문서 (호환성)
+  | 'entity'     // 엔티티 (호환성)
+  | 'concept'    // 개념 (호환성)
+  | 'unknown'    // 기본값
 
 export interface GraphNode {
   id: string

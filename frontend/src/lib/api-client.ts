@@ -90,7 +90,7 @@ class APIClient {
 
         // Extract error message, handling both string and object formats
         let errorMessage: string | undefined
-        const responseData = error.response.data
+        const responseData = error.response.data as any
         if (responseData) {
           // Check if detail is an object with error_message
           if (typeof responseData.detail === 'object' && responseData.detail?.error_message) {
@@ -293,15 +293,19 @@ class APIClient {
     })
   }
 
-  async uploadDocument(file: File, metadata: {
-    insurer: string
-    product_name: string
-    product_code?: string
-    launch_date?: string
-    description?: string
-    document_type?: string
-    tags?: string
-  }): Promise<{ document_id: string; job_id: string; message: string }> {
+  async uploadDocument(
+    file: File,
+    metadata: {
+      insurer: string
+      product_name: string
+      product_code?: string
+      launch_date?: string
+      description?: string
+      document_type?: string
+      tags?: string
+    },
+    onUploadProgress?: (progressEvent: { loaded: number; total?: number; progress?: number }) => void
+  ): Promise<{ document_id: string; job_id: string; message: string }> {
     const formData = new FormData()
     formData.append('file', file)
     Object.entries(metadata).forEach(([key, value]) => {
@@ -311,6 +315,17 @@ class APIClient {
     const response = await this.client.post('/documents/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
+      },
+      timeout: 120000, // 2 minutes for file upload and DB storage
+      onUploadProgress: (progressEvent) => {
+        if (onUploadProgress && progressEvent.total) {
+          const progress = (progressEvent.loaded / progressEvent.total) * 100
+          onUploadProgress({
+            loaded: progressEvent.loaded,
+            total: progressEvent.total,
+            progress: progress,
+          })
+        }
       },
     })
     return response.data
@@ -394,6 +409,110 @@ class APIClient {
 
   async getPortfolioAnalysis(customerId: string): Promise<import('@/types').PortfolioAnalysis> {
     const response = await this.client.get(`/customers/${customerId}/portfolio-analysis`)
+    return response.data
+  }
+
+  // Stats APIs
+  async getTimeseriesStats(): Promise<Array<{
+    date: string
+    learnedDocs: number
+    inProgressDocs: number
+    pendingDocs: number
+    totalDocs: number
+  }>> {
+    const response = await this.client.get('/documents/stats/timeseries')
+    return response.data
+  }
+
+  // Crawler APIs
+  async getCrawlerConfigs(enabledOnly = false): Promise<any[]> {
+    const response = await this.client.get('/crawler/configs', {
+      params: { enabled_only: enabledOnly }
+    })
+    return response.data
+  }
+
+  async getCompanyCrawledDocuments(
+    companyName: string,
+    page = 1,
+    pageSize = 50,
+    statusFilter?: string
+  ): Promise<{
+    company_name: string
+    total: number
+    page: number
+    page_size: number
+    total_pages: number
+    documents: any[]
+  }> {
+    const response = await this.client.get(`/crawler/companies/${encodeURIComponent(companyName)}/documents`, {
+      params: {
+        page,
+        page_size: pageSize,
+        status_filter: statusFilter
+      }
+    })
+    return response.data
+  }
+
+  async startCrawlJob(companyName: string): Promise<{
+    job_id: string
+    status: string
+  }> {
+    const response = await this.client.post(`/crawler/jobs/start/${encodeURIComponent(companyName)}`)
+    return response.data
+  }
+
+  async getCrawlerJobs(
+    companyName?: string,
+    page = 1,
+    pageSize = 20
+  ): Promise<{
+    jobs: any[]
+    total: number
+    page: number
+    page_size: number
+  }> {
+    const response = await this.client.get('/crawler/jobs', {
+      params: {
+        company_name: companyName,
+        page,
+        page_size: pageSize
+      }
+    })
+    return response.data
+  }
+
+  async downloadCrawledDocuments(jobId: string): Promise<{
+    message: string
+    total_pending: number
+  }> {
+    const response = await this.client.post(`/crawler/jobs/${jobId}/download`)
+    return response.data
+  }
+
+  async testUrlCrawling(
+    url: string,
+    crawlerType: 'selenium' = 'selenium',
+    headless: boolean = true
+  ): Promise<{
+    success: boolean
+    url: string
+    page_title: string | null
+    content_length: number
+    load_time: number
+    current_url?: string
+    pdf_links_found?: number
+    pdf_links?: Array<{ url: string; text: string; title: string }>
+    error?: string
+  }> {
+    const response = await this.client.post('/crawler/test-url', null, {
+      params: {
+        url,
+        crawler_type: crawlerType,
+        headless
+      }
+    })
     return response.data
   }
 }

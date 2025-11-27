@@ -22,12 +22,22 @@ interface GraphVisualizationProps {
   selectedNodeId?: string | null
 }
 
-// Node type colors
-const nodeColors: Record<NodeType, string> = {
-  document: '#3B82F6', // blue-500
-  entity: '#10B981', // green-500
-  concept: '#F59E0B', // amber-500
-  clause: '#8B5CF6', // violet-500
+// Node type colors - 실제 Neo4j 노드 타입에 맞춘 색상
+const nodeColors: Record<string, string> = {
+  // Neo4j 노드 타입
+  product: '#2563EB',    // blue-600 - 보험 상품
+  coverage: '#059669',   // emerald-600 - 보장
+  disease: '#DC2626',    // red-600 - 질병
+  condition: '#D97706',  // amber-600 - 조건
+  clause: '#7C3AED',     // violet-600 - 조항
+
+  // 기존 타입 (호환성)
+  document: '#2563EB',   // blue-600
+  entity: '#059669',     // emerald-600
+  concept: '#D97706',    // amber-600
+
+  // 기본값
+  unknown: '#6B7280',    // gray-500
 }
 
 // Layout algorithm using dagre
@@ -85,19 +95,20 @@ export default function GraphVisualization({
         customData: node,
       },
       style: {
-        backgroundColor: nodeColors[node.type],
+        backgroundColor: nodeColors[node.type] || nodeColors['unknown'],
         color: 'white',
         border: selectedNodeId === node.id ? '3px solid #1E40AF' : 'none',
         borderRadius: '8px',
         padding: '10px',
         fontSize: '12px',
-        fontWeight: '500',
+        fontWeight: '600',
         width: 180,
         height: 60,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
       },
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
@@ -111,16 +122,28 @@ export default function GraphVisualization({
       type: 'smoothstep',
       animated: false,
       style: {
-        stroke: '#94A3B8',
-        strokeWidth: edge.weight ? Math.max(1, edge.weight * 3) : 1,
+        stroke: '#475569',
+        strokeWidth: edge.weight ? Math.max(2, edge.weight * 3) : 2,
       },
       markerEnd: {
         type: MarkerType.ArrowClosed,
-        color: '#94A3B8',
+        color: '#475569',
+        width: 20,
+        height: 20,
       },
       labelStyle: {
-        fontSize: 10,
-        fill: '#64748B',
+        fontSize: 11,
+        fontWeight: 600,
+        fill: '#334155',
+        background: '#FFFFFF',
+        padding: 4,
+        borderRadius: 3,
+      },
+      labelBgPadding: [8, 4] as [number, number],
+      labelBgBorderRadius: 4,
+      labelBgStyle: {
+        fill: '#FFFFFF',
+        fillOpacity: 0.9,
       },
     }))
 
@@ -187,7 +210,9 @@ export default function GraphVisualization({
         <MiniMap
           nodeColor={(node) => {
             const customData = node.data.customData as CustomGraphNode
-            return customData ? nodeColors[customData.type] : '#94A3B8'
+            return customData
+              ? nodeColors[customData.type] || nodeColors['unknown']
+              : nodeColors['unknown']
           }}
           maskColor="rgba(255, 255, 255, 0.8)"
         />

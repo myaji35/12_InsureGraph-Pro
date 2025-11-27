@@ -1,49 +1,81 @@
 'use client'
 
 import { GraphNode, NodeType } from '@/types'
-import { XMarkIcon, DocumentTextIcon, TagIcon, CubeIcon, ScaleIcon } from '@heroicons/react/24/outline'
+import {
+  XMarkIcon,
+  DocumentTextIcon,
+  TagIcon,
+  CubeIcon,
+  ScaleIcon,
+  ShieldCheckIcon,
+  HeartIcon,
+  ExclamationTriangleIcon,
+} from '@heroicons/react/24/outline'
 
 interface NodeDetailProps {
   node: GraphNode
   onClose: () => void
 }
 
-const nodeTypeLabels: Record<NodeType, string> = {
+const nodeTypeLabels: Partial<Record<NodeType, string>> = {
+  // Neo4j 노드 타입
+  product: '보험상품',
+  coverage: '보장',
+  disease: '질병',
+  condition: '조건',
+  clause: '조항',
+  // 기존 타입 (호환성)
   document: '문서',
   entity: '엔티티',
   concept: '개념',
-  clause: '조항',
+  unknown: '미분류',
 }
 
-const nodeTypeIcons: Record<NodeType, React.ComponentType<{ className?: string }>> = {
+const nodeTypeIcons: Partial<Record<NodeType, React.ComponentType<{ className?: string }>>> = {
+  // Neo4j 노드 타입
+  product: ShieldCheckIcon,
+  coverage: TagIcon,
+  disease: HeartIcon,
+  condition: ExclamationTriangleIcon,
+  clause: ScaleIcon,
+  // 기존 타입 (호환성)
   document: DocumentTextIcon,
   entity: TagIcon,
   concept: CubeIcon,
-  clause: ScaleIcon,
+  unknown: CubeIcon,
 }
 
-const nodeTypeColors: Record<NodeType, string> = {
-  document: 'text-blue-600 bg-blue-100',
-  entity: 'text-green-600 bg-green-100',
-  concept: 'text-amber-600 bg-amber-100',
-  clause: 'text-violet-600 bg-violet-100',
+const nodeTypeColors: Partial<Record<NodeType, string>> = {
+  // Neo4j 노드 타입
+  product: 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30',
+  coverage: 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-900/30',
+  disease: 'text-red-600 bg-red-100 dark:text-red-400 dark:bg-red-900/30',
+  condition: 'text-amber-600 bg-amber-100 dark:text-amber-400 dark:bg-amber-900/30',
+  clause: 'text-violet-600 bg-violet-100 dark:text-violet-400 dark:bg-violet-900/30',
+  // 기존 타입 (호환성)
+  document: 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30',
+  entity: 'text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30',
+  concept: 'text-amber-600 bg-amber-100 dark:text-amber-400 dark:bg-amber-900/30',
+  unknown: 'text-gray-600 bg-gray-100 dark:text-gray-400 dark:bg-gray-900/30',
 }
 
 export default function NodeDetail({ node, onClose }: NodeDetailProps) {
-  const Icon = nodeTypeIcons[node.type]
+  const Icon = nodeTypeIcons[node.type] || nodeTypeIcons['unknown'] || CubeIcon
+  const label = nodeTypeLabels[node.type] || node.type || '미분류'
+  const color = nodeTypeColors[node.type] || nodeTypeColors['unknown'] || 'text-gray-600 bg-gray-100'
 
   return (
     <div className="card h-full overflow-y-auto">
       {/* Header */}
       <div className="flex items-start justify-between mb-6">
         <div className="flex items-start gap-3 flex-1">
-          <div className={`p-3 rounded-lg ${nodeTypeColors[node.type]}`}>
-            <Icon className="w-6 h-6" />
+          <div className={`p-3 rounded-lg ${color}`}>
+            {Icon && <Icon className="w-6 h-6" />}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <span className="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase">
-                {nodeTypeLabels[node.type]}
+                {label}
               </span>
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 break-words">

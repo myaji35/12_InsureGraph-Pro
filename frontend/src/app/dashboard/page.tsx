@@ -1,138 +1,127 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import { useUser } from '@clerk/nextjs'
-import DashboardLayout from '@/components/DashboardLayout'
-import {
-  DocumentTextIcon,
-  ChatBubbleLeftRightIcon,
-  UsersIcon,
-  ChartBarIcon,
-} from '@heroicons/react/24/outline'
+import { useState } from "react";
+import DashboardLayout from "@/components/DashboardLayout";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import InsurerStatsGrid from "@/components/dashboard/InsurerStatsGrid";
+import InsurerDetailView from "@/components/dashboard/InsurerDetailView";
+import TimeSeriesChart from "@/components/dashboard/TimeSeriesChart";
+
+// 30개 보험사 목록
+const INSURERS = [
+  "삼성생명", "한화생명", "교보생명", "DB생명", "신한라이프",
+  "메트라이프생명", "처브라이프", "푸르덴셜생명", "AIA생명", "DGB생명",
+  "ABL생명", "KB라이프생명", "BNP파리바카디프생명", "KDB생명", "IBK연금보험",
+  "삼성화재", "현대해상", "DB손해보험", "KB손해보험", "메리츠화재",
+  "한화손해보험", "롯데손해보험", "MG손해보험", "흥국화재", "캐롯손해보험",
+  "AXA손해보험", "하나손해보험", "NH농협손해보험", "BNK손해보험", "THE K손해보험"
+];
 
 export default function DashboardPage() {
-  const { user } = useUser()
+  const [selectedInsurer, setSelectedInsurer] = useState<string | null>(null);
 
   return (
     <DashboardLayout>
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-          대시보드
-        </h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          안녕하세요, {user?.firstName || user?.emailAddresses[0]?.emailAddress}님!
-        </p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">총 문서</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">24</p>
-            </div>
-            <DocumentTextIcon className="w-12 h-12 text-primary-500" />
-          </div>
-          <div className="mt-4">
-            <span className="text-xs text-green-600">+12% from last month</span>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">보험사별 문서 학습 현황</h1>
+            <p className="text-muted-foreground mt-2">
+              30개 보험사의 문서 학습 진행 상황을 한눈에 확인하세요
+            </p>
           </div>
         </div>
 
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">질의응답</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">156</p>
-            </div>
-            <ChatBubbleLeftRightIcon className="w-12 h-12 text-blue-500" />
-          </div>
-          <div className="mt-4">
-            <span className="text-xs text-green-600">+23% from last month</span>
-          </div>
+        {/* 전체 통계 요약 */}
+        <div className="grid gap-4 md:grid-cols-4">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">총 보험사</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">30개</div>
+              <p className="text-xs text-muted-foreground">
+                생명보험 15개, 손해보험 15개
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">예상 문서 수</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">1,200개</div>
+              <p className="text-xs text-muted-foreground">
+                평균 40개/보험사
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">학습 완료</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">1개</div>
+              <p className="text-xs text-muted-foreground">
+                전체의 0.08%
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">미학습</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">1,199개</div>
+              <p className="text-xs text-muted-foreground">
+                학습 대기 중
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">고객 수</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">48</p>
-            </div>
-            <UsersIcon className="w-12 h-12 text-purple-500" />
-          </div>
-          <div className="mt-4">
-            <span className="text-xs text-green-600">+8% from last month</span>
-          </div>
-        </div>
+        {/* 시계열 그래프 */}
+        <Card>
+          <CardHeader>
+            <CardTitle>학습 문서 추이</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <TimeSeriesChart />
+          </CardContent>
+        </Card>
 
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">분석 완료</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">89%</p>
-            </div>
-            <ChartBarIcon className="w-12 h-12 text-green-500" />
-          </div>
-          <div className="mt-4">
-            <span className="text-xs text-green-600">+5% from last month</span>
-          </div>
-        </div>
-      </div>
+        {/* 탭: 보험사 목록 vs 상세보기 */}
+        <Tabs defaultValue="grid" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="grid">보험사 목록</TabsTrigger>
+            {selectedInsurer && (
+              <TabsTrigger value="detail">
+                {selectedInsurer} 상세
+              </TabsTrigger>
+            )}
+          </TabsList>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Link href="/documents/upload">
-          <div className="card hover:shadow-lg transition-shadow cursor-pointer">
-            <DocumentTextIcon className="w-10 h-10 text-primary-600 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">문서 업로드</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">새로운 약관 문서를 업로드하고 분석하세요</p>
-          </div>
-        </Link>
+          <TabsContent value="grid" className="space-y-4">
+            <InsurerStatsGrid
+              insurers={INSURERS}
+              onSelectInsurer={setSelectedInsurer}
+            />
+          </TabsContent>
 
-        <Link href="/query">
-          <div className="card hover:shadow-lg transition-shadow cursor-pointer">
-            <ChatBubbleLeftRightIcon className="w-10 h-10 text-blue-600 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">질의응답</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">약관에 대해 질문하고 답변을 받으세요</p>
-          </div>
-        </Link>
-
-        <Link href="/customers">
-          <div className="card hover:shadow-lg transition-shadow cursor-pointer">
-            <UsersIcon className="w-10 h-10 text-purple-600 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">고객 관리</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm">고객 포트폴리오를 분석하세요</p>
-          </div>
-        </Link>
-      </div>
-
-      {/* Recent Activity */}
-      <div className="card">
-        <h3 className="text-lg font-semibold mb-4">최근 활동</h3>
-        <div className="space-y-4">
-          <div className="flex items-start gap-4 pb-4 border-b border-gray-100 dark:border-dark-border">
-            <div className="w-2 h-2 rounded-full bg-primary-500 mt-2" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">삼성화재 암보험 약관 업로드 완료</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">2시간 전</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4 pb-4 border-b border-gray-100 dark:border-dark-border">
-            <div className="w-2 h-2 rounded-full bg-blue-500 mt-2" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">고객 김철수님 포트폴리오 분석 완료</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">5시간 전</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-4">
-            <div className="w-2 h-2 rounded-full bg-green-500 mt-2" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100">현대해상 실손보험 약관 질의 15건 처리</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">1일 전</p>
-            </div>
-          </div>
-        </div>
+          {selectedInsurer && (
+            <TabsContent value="detail" className="space-y-4">
+              <InsurerDetailView
+                insurer={selectedInsurer}
+                onBack={() => setSelectedInsurer(null)}
+              />
+            </TabsContent>
+          )}
+        </Tabs>
       </div>
     </DashboardLayout>
-  )
+  );
 }

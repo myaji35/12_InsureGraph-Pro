@@ -14,17 +14,8 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { user, isLoaded } = useUser()
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
-  // Clerk의 미들웨어가 인증을 처리하므로 여기서는 로딩 상태만 체크
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-bg">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 dark:border-primary-400 mx-auto"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">로딩 중...</p>
-        </div>
-      </div>
-    )
-  }
+  // Clerk 로딩 중에도 레이아웃을 표시하여 더 빠른 체감 속도 제공
+  // 미들웨어가 인증을 처리하므로 안전함
 
   return (
     <>
@@ -42,7 +33,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
           {/* Page content */}
           <main id="main-content" className="flex-1 overflow-y-auto" tabIndex={-1}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="px-[10px] py-8">
               {children}
             </div>
           </main>

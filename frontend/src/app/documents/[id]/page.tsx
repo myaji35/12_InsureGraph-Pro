@@ -36,7 +36,7 @@ export default function DocumentDetailPage({ params }: { params: { id: string } 
   const handleDelete = async () => {
     try {
       setIsDeleting(true)
-      await deleteDocument(resolvedParams.id)
+      await deleteDocument(params.id)
       router.push('/documents')
     } catch (error) {
       console.error('Failed to delete document:', error)

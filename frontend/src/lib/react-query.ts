@@ -14,7 +14,7 @@ export const queryClient = new QueryClient({
       // Refetch configuration
       refetchOnWindowFocus: false, // Don't refetch on window focus
       refetchOnReconnect: true, // Refetch on reconnect
-      refetchOnMount: true, // Refetch on component mount
+      refetchOnMount: false, // Use cached data when available (faster navigation)
 
       // Error handling
       throwOnError: false, // Don't throw errors globally
