@@ -98,11 +98,88 @@ This document defines the technical architecture for InsureGraph Pro, a GraphRAG
 
 ### Core API Endpoints
 
+#### 0. Metadata Management API (Human-in-the-Loop)
+
+**GET /api/v1/metadata/policies**
+
+Retrieve list of discovered policies from metadata crawler.
+
+```json
+Request:
+GET /api/v1/metadata/policies?status=DISCOVERED&insurer=Samsung%20Life&limit=50
+
+Response:
+{
+  "policies": [
+    {
+      "id": "meta_001",
+      "insurer": "Samsung Life",
+      "category": "cancer",
+      "policy_name": "종합암보험 2.0 약관",
+      "file_name": "cancer_insurance_v2_2025.pdf",
+      "publication_date": "2025-11-01",
+      "download_url": "https://www.samsunglife.com/disclosure/download?id=12345",
+      "status": "DISCOVERED",
+      "discovered_at": "2025-11-25T09:00:00Z"
+    }
+  ],
+  "pagination": {
+    "total": 247,
+    "page": 1,
+    "per_page": 50
+  }
+}
+```
+
+**POST /api/v1/metadata/queue**
+
+Queue selected policies for learning (admin action).
+
+```json
+Request:
+{
+  "policy_ids": ["meta_001", "meta_002"],
+  "priority": "high",
+  "notes": "New cancer insurance products - urgent for sales team"
+}
+
+Response:
+{
+  "queued_count": 2,
+  "jobs_created": [
+    {
+      "job_id": "job_12345",
+      "policy_id": "meta_001",
+      "status": "QUEUED"
+    }
+  ]
+}
+```
+
+**PATCH /api/v1/metadata/policies/{id}**
+
+Update policy metadata status (e.g., mark as IGNORED).
+
+```json
+Request:
+{
+  "status": "IGNORED",
+  "notes": "Duplicate of existing policy"
+}
+
+Response:
+{
+  "id": "meta_001",
+  "status": "IGNORED",
+  "updated_at": "2025-11-25T10:30:00Z"
+}
+```
+
 #### 1. Ingestion API
 
 **POST /api/v1/policies/ingest**
 
-Upload and process insurance policy PDF.
+Download and process queued insurance policy PDF (triggered by metadata queue).
 
 ```json
 Request:
@@ -774,15 +851,42 @@ CREATE INDEX idx_query_logs_user_id ON query_logs(user_id);
 CREATE INDEX idx_query_logs_created_at ON query_logs(created_at);
 
 -- ============================================
+-- Policy Metadata (Human-in-the-Loop)
+-- ============================================
+
+CREATE TABLE policy_metadata (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  insurer VARCHAR(255) NOT NULL,
+  category VARCHAR(100),  -- 'cancer', 'life', 'annuity', etc.
+  policy_name VARCHAR(500) NOT NULL,
+  file_name VARCHAR(500),
+  publication_date DATE,
+  download_url TEXT NOT NULL,  -- Original source URL from insurer website
+  status VARCHAR(50) DEFAULT 'DISCOVERED',  -- 'DISCOVERED', 'QUEUED', 'DOWNLOADING', 'PROCESSING', 'COMPLETED', 'FAILED', 'IGNORED'
+  queued_by UUID REFERENCES users(id),  -- Admin who queued this for learning
+  queued_at TIMESTAMP,
+  discovered_at TIMESTAMP DEFAULT NOW(),
+  last_updated TIMESTAMP DEFAULT NOW(),
+  notes TEXT  -- Manual review notes
+);
+
+CREATE INDEX idx_policy_metadata_status ON policy_metadata(status);
+CREATE INDEX idx_policy_metadata_insurer ON policy_metadata(insurer);
+CREATE INDEX idx_policy_metadata_publication_date ON policy_metadata(publication_date);
+CREATE FULLTEXT INDEX idx_policy_metadata_search ON policy_metadata(policy_name, file_name);
+
+-- ============================================
 -- Ingestion Jobs
 -- ============================================
 
 CREATE TABLE ingestion_jobs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  policy_metadata_id UUID REFERENCES policy_metadata(id),  -- Link to metadata
   user_id UUID REFERENCES users(id),
   file_name VARCHAR(255),
   file_size BIGINT,
-  file_url TEXT,  -- S3 URL
+  file_url TEXT,  -- S3 URL (internal storage)
+  download_url TEXT,  -- Original source URL
   status VARCHAR(50),  -- 'pending', 'processing', 'completed', 'failed'
   progress INTEGER DEFAULT 0,
   error_message TEXT,
@@ -793,6 +897,7 @@ CREATE TABLE ingestion_jobs (
   completed_at TIMESTAMP
 );
 
+CREATE INDEX idx_ingestion_jobs_policy_metadata_id ON ingestion_jobs(policy_metadata_id);
 CREATE INDEX idx_ingestion_jobs_user_id ON ingestion_jobs(user_id);
 CREATE INDEX idx_ingestion_jobs_status ON ingestion_jobs(status);
 
@@ -840,6 +945,48 @@ CREATE INDEX idx_audit_logs_action ON audit_logs(action);
 
 ## 🔄 Data Ingestion Pipeline Architecture
 
+### Human-in-the-Loop Data Collection Strategy
+
+**Strategic Background**: To minimize legal risks from unauthorized mass crawling and optimize learning costs, we adopt a "metadata-first collection with human curation" approach.
+
+#### 4 Core Components
+
+1. **Lightweight Metadata Crawler (Discovery Bot)**
+   - Function: Periodically crawls insurance company public disclosure pages, parses HTML lists only
+   - **NEVER downloads PDF attachments directly**
+   - Collected Data: Insurer name, category, policy name, publication date, filename, **original download link URL**
+   - Tech Stack: Python Scrapy, Node.js Puppeteer (for dynamic pages)
+
+2. **Central Metadata Database**
+   - Function: Manages ledger of collected policy metadata and lifecycle status
+   - Status Fields: `DISCOVERED`, `QUEUED`, `DOWNLOADING`, `PROCESSING`, `COMPLETED`, `FAILED`, `IGNORED`
+   - Database: PostgreSQL with `policy_metadata` table
+
+3. **Admin Curation Dashboard**
+   - Function: Web interface for stakeholders to review and select policies for learning
+   - Key Actions:
+     - Filter/search by insurer, date, keywords
+     - View learning status with visual indicators
+     - **[Start Learning]** button triggers on-demand download
+   - Tech Stack: Next.js, React Table
+
+4. **On-demand Downloader & Ingestion Worker**
+   - Function: Background process that executes only when requested by admin
+   - Execution Flow:
+     1. Receives `QUEUED` jobs
+     2. Downloads file from stored download URL
+     3. Stores in internal S3 bucket
+     4. Triggers GraphRAG learning pipeline
+     5. Updates DB status to `COMPLETED` or `FAILED`
+   - Tech Stack: Celery, AWS SQS + Lambda
+
+#### Operational Benefits
+
+- **Legal Compliance**: Metadata access is within normal browsing scope; final download is explicit admin action
+- **Cost Optimization**: Filter out duplicate, outdated, or low-value files before processing
+- **Strategic Prioritization**: Learn urgent/high-value policies first
+- **Risk Mitigation**: Avoid DDoS-like server load; respect robots.txt
+
 ### Pipeline Stages (LangGraph Orchestration)
 
 ```python
@@ -851,6 +998,7 @@ class IngestionState(TypedDict):
     job_id: str
     file_path: str
     metadata: dict
+    download_url: str  # NEW: Original source URL from metadata DB
 
     # Stage 1: OCR
     ocr_text: str

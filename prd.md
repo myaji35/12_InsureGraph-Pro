@@ -57,11 +57,21 @@ Edges: COVERS(보장하다), EXCLUDES(면책하다), REQUIRES(조건을 요하�
 
 4. Epics & User Stories
 Epic 1: Data Ingestion & Knowledge Graph Construction (Backend)
-약관 PDF를 구조화된 지식 그래프로 변환하는 핵심 파이프라인
+약관 PDF를 구조화된 지식 그래프로 변환하는 핵심 파이프라인 (Human-in-the-Loop 큐레이션 전략 적용)
+
+Feature 1.0: Human-in-the-Loop Data Collection Architecture (NEW)
+
+Story: 시스템은 보험사 공시실에서 약관 메타데이터(파일명, 게시일, 다운로드 링크)만 수집하는 경량 크롤러를 운영해야 한다.
+
+Story: 관리자는 대시보드에서 수집된 약관 목록을 조회하고, 학습이 필요한 파일을 선택적으로 큐에 등록할 수 있어야 한다.
+
+Story: 관리자가 선택한 파일만 온디맨드로 다운로드하고 학습 파이프라인을 실행하여 법적 리스크를 최소화해야 한다.
+
+Story: 각 약관의 상태(DISCOVERED, QUEUED, PROCESSING, COMPLETED, FAILED, IGNORED)를 중앙 DB에서 관리하고 진행 상황을 시각화해야 한다.
 
 Feature 1.1: Intelligent OCR & Parsing
 
-Story: 시스템은 PDF 약관을 업로드하면 텍스트, 표, 플로우차트를 인식하여 Markdown 형식으로 변환해야 한다.
+Story: 시스템은 관리자가 승인한 PDF 약관을 다운로드하면 텍스트, 표, 플로우차트를 인식하여 Markdown 형식으로 변환해야 한다.
 
 Story: 텍스트 내에서 '제1조', '①항', '다만' 등의 법률적 계층 구조를 식별하여 청크(Chunk) 단위로 분할해야 한다.
 
@@ -120,7 +130,13 @@ Cypher
 (Coverage)-->(Condition)
 (Product)-->(Product) // 파생 관계 (Pre-computed)
 5.2. API Endpoints (FastAPI)
-POST /api/v1/ingest/policy: PDF 업로드 및 그래프 파이프라인 트리거.
+GET /api/v1/metadata/policies: 메타데이터 크롤러가 수집한 약관 목록 조회 (필터링: 보험사, 기간, 상태).
+
+POST /api/v1/metadata/queue: 관리자가 선택한 약관을 학습 큐에 등록.
+
+POST /api/v1/ingest/policy: 큐에 등록된 PDF를 다운로드하고 그래프 파이프라인 트리거.
+
+GET /api/v1/ingest/status/{job_id}: 학습 작업 진행 상황 조회.
 
 POST /api/v1/analysis/query: 사용자 자연어 질문 입력 -> GraphRAG 결과 반환.
 
@@ -162,6 +178,7 @@ Risk	Impact	Mitigation Strategy
 Hallucination	치명적 (오안내로 인한 배상 책임)	GraphRAG의 '근거 기반' 답변만 출력하도록 설정. 답변 하단에 "약관 원문 제X조 X항 참조" 링크 필수 첨부.
 Regulatory	서비스 중단	금융규제 샌드박스 '혁신금융서비스' 사전 신청 및 지정 획득. 개인정보 비식별화 모듈 최우선 개발.
 Data Quality	분석 오류	LLM이 아닌 Rule-based 파서와 병행하여 약관의 숫자(금액, 기간) 데이터 정확도 이중 검증.
+Legal Risk (Crawling)	법적 분쟁 및 서비스 차단	Human-in-the-Loop 메타데이터 우선 수집 전략 채택. 관리자 승인 없이 PDF 자동 다운로드 금지. robots.txt 준수 및 크롤링 속도 제한.
 Note to Developers (BMAD Context):
 
 Analyst Agent: Has verified the market need for "C77 thyroid cancer" like specific use cases.

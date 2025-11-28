@@ -10,16 +10,20 @@
 
 ## Executive Summary
 
-Build the core data ingestion pipeline that transforms insurance policy PDFs into a structured knowledge graph. This is the foundational capability that enables all downstream features - without accurate data ingestion, the entire GraphRAG system fails.
+Build the core data ingestion pipeline that transforms insurance policy PDFs into a structured knowledge graph, using a **Human-in-the-Loop metadata curation strategy** to minimize legal risks and optimize learning costs. This is the foundational capability that enables all downstream features - without accurate data ingestion, the entire GraphRAG system fails.
 
 ### Business Value
 
 - **Enable Product**: Foundation for all analysis features
 - **Competitive Advantage**: Accurate parsing of complex Korean legal documents
+- **Legal Risk Mitigation**: Metadata-first approach prevents unauthorized mass crawling issues
+- **Cost Optimization**: Filter low-value files before expensive GraphRAG processing
 - **Scalability**: Automated pipeline supports 50+ policies in Phase 1, 500+ in Phase 3
 
 ### Success Criteria
 
+- ✅ Metadata crawler discovers 100+ policies without legal issues
+- ✅ Admin dashboard enables efficient policy selection and queueing
 - ✅ Successfully ingest 10 sample cancer insurance policies
 - ✅ Achieve 95%+ accuracy on critical data (amounts, periods)
 - ✅ Graph construction completes in < 5 minutes per policy
@@ -28,6 +32,169 @@ Build the core data ingestion pipeline that transforms insurance policy PDFs int
 ---
 
 ## User Stories
+
+### Story 1.0: Metadata Crawler & Human Curation Dashboard
+
+**Story ID**: STORY-1.0
+**Priority**: Critical (P0)
+**Story Points**: 8
+
+#### User Story
+
+```
+As an Admin user,
+I want to view discovered insurance policies in a curation dashboard and selectively queue them for learning,
+So that I can build the knowledge graph strategically while minimizing legal and cost risks.
+```
+
+#### Acceptance Criteria
+
+**Given** the metadata crawler has discovered new policies
+**When** I access the admin curation dashboard
+**Then** the system should:
+- Display a filterable list of discovered policies (status: DISCOVERED)
+- Show insurer name, category, policy name, publication date, file name
+- Allow filtering by: insurer, date range, category, status
+- Allow full-text search on policy name and file name
+- Display current status with color-coded indicators
+
+**Given** I select one or more policies
+**When** I click the [Queue for Learning] button
+**Then** the system should:
+- Update status from DISCOVERED → QUEUED
+- Record my user ID as `queued_by`
+- Create ingestion job records in the database
+- Trigger the on-demand downloader worker
+- Show confirmation message with job IDs
+
+**Given** a policy is already COMPLETED or PROCESSING
+**When** I view the dashboard
+**Then** the system should:
+- Disable the [Queue for Learning] button
+- Show completion date and results (nodes/edges created)
+- Allow viewing the ingestion log
+
+**Given** I want to ignore a policy
+**When** I mark it as IGNORED
+**Then** the system should:
+- Update status to IGNORED
+- Remove from default view (show only in "Ignored" filter)
+- Allow adding notes explaining why it was ignored
+
+#### Technical Tasks
+
+**Metadata Crawler**:
+- [ ] Implement lightweight web scraper (Python Scrapy or Node.js Puppeteer)
+  - [ ] Target: Samsung Life, Hanwha Life, Kyobo Life disclosure pages
+  - [ ] Extract: policy name, publication date, download URL
+  - [ ] Parse HTML tables/lists only (NO PDF downloads)
+  - [ ] Respect robots.txt and crawl delays
+- [ ] Create `policy_metadata` table in PostgreSQL
+- [ ] Implement crawler scheduler (daily runs via cron/Celery Beat)
+- [ ] Add error handling and retry logic
+- [ ] Write unit tests for parser
+
+**Admin Curation Dashboard (Frontend)**:
+- [ ] Create `/admin/metadata` page (Next.js)
+- [ ] Implement policy list table with:
+  - [ ] Status column with color badges
+  - [ ] Filter controls (insurer, date, category, status)
+  - [ ] Search box (debounced full-text search)
+  - [ ] Checkbox selection for batch queueing
+- [ ] Implement [Queue for Learning] action button
+- [ ] Add status detail modal (show ingestion results)
+- [ ] Add notes/ignore functionality
+- [ ] Write Cypress E2E tests
+
+**Backend API**:
+- [ ] Implement `GET /api/v1/metadata/policies` endpoint
+  - [ ] Support query params: status, insurer, date_from, date_to, search, limit, offset
+  - [ ] Return paginated results
+- [ ] Implement `POST /api/v1/metadata/queue` endpoint
+  - [ ] Validate policy IDs
+  - [ ] Update status to QUEUED
+  - [ ] Create ingestion_jobs records
+  - [ ] Trigger Celery worker task
+- [ ] Implement `PATCH /api/v1/metadata/policies/{id}` endpoint
+  - [ ] Allow status updates (IGNORED, DISCOVERED)
+  - [ ] Record notes
+- [ ] Write unit tests for all endpoints
+
+**On-demand Downloader Worker**:
+- [ ] Implement Celery task `download_and_ingest_policy(job_id)`
+  - [ ] Fetch metadata from DB
+  - [ ] Download PDF from `download_url`
+  - [ ] Store in S3 with versioning
+  - [ ] Update status to DOWNLOADING → PROCESSING
+  - [ ] Trigger existing ingestion pipeline (Story 1.2+)
+- [ ] Add retry logic (max 3 attempts)
+- [ ] Implement webhook/notification on completion
+
+#### Dependencies
+
+- PostgreSQL database setup
+- Celery worker infrastructure
+- AWS S3 bucket provisioned
+- Admin user authentication (RBAC)
+
+#### Technical Notes
+
+**Crawler Example (Scrapy)**:
+
+```python
+import scrapy
+
+class InsurancePolicyCrawler(scrapy.Spider):
+    name = 'samsung_life_crawler'
+    start_urls = ['https://www.samsunglife.com/disclosure/policies']
+
+    def parse(self, response):
+        for row in response.css('table.policy-list tr'):
+            yield {
+                'insurer': 'Samsung Life',
+                'policy_name': row.css('td.policy-name::text').get(),
+                'publication_date': row.css('td.date::text').get(),
+                'download_url': response.urljoin(row.css('a.download::attr(href)').get()),
+                'status': 'DISCOVERED',
+            }
+```
+
+**API Response Example**:
+
+```json
+GET /api/v1/metadata/policies?status=DISCOVERED&limit=10
+
+{
+  "policies": [
+    {
+      "id": "meta_001",
+      "insurer": "Samsung Life",
+      "category": "cancer",
+      "policy_name": "종합암보험 2.0 약관",
+      "file_name": "cancer_insurance_v2_2025.pdf",
+      "publication_date": "2025-11-01",
+      "download_url": "https://www.samsunglife.com/download?id=12345",
+      "status": "DISCOVERED",
+      "discovered_at": "2025-11-25T09:00:00Z"
+    }
+  ],
+  "total": 247,
+  "page": 1,
+  "per_page": 10
+}
+```
+
+#### Definition of Done
+
+- [ ] Metadata crawler running on schedule (daily)
+- [ ] Admin dashboard deployed and accessible
+- [ ] Can discover 100+ policies from 3 insurers
+- [ ] Can queue and process selected policies end-to-end
+- [ ] All API endpoints tested and documented
+- [ ] No legal issues reported (robots.txt compliant)
+- [ ] Manual QA completed by product manager
+
+---
 
 ### Story 1.1: PDF Upload & Job Management
 
@@ -954,23 +1121,25 @@ So that I can catch errors before they impact users.
 ## Epic Dependencies
 
 ```
-Story 1.1 (Upload)
+Story 1.0 (Metadata Crawler & Dashboard)
     ↓
-Story 1.2 (OCR)
-    ↓
-Story 1.3 (Parse)
-    ↓
-Story 1.4 (Extract) ←─┐
-    ↓                  │
-Story 1.5 (LLM) ──────┘ (validation)
-    ↓
-Story 1.6 (Link)
-    ↓
-Story 1.7 (Graph)
-    ↓
-Story 1.8 (Orchestration)
-    ↓
-Story 1.9 (Validation)
+    ├─→ Story 1.1 (Upload & Job Management)
+    │       ↓
+    └─────→ Story 1.2 (OCR)
+                ↓
+            Story 1.3 (Parse)
+                ↓
+            Story 1.4 (Extract) ←─┐
+                ↓                  │
+            Story 1.5 (LLM) ──────┘ (validation)
+                ↓
+            Story 1.6 (Link)
+                ↓
+            Story 1.7 (Graph)
+                ↓
+            Story 1.8 (Orchestration)
+                ↓
+            Story 1.9 (Validation)
 ```
 
 ---
@@ -979,33 +1148,41 @@ Story 1.9 (Validation)
 
 | Risk | Impact | Probability | Mitigation |
 |------|--------|-------------|------------|
+| **Legal issues from crawling** | Critical | Medium | Human-in-the-Loop metadata approach; NO auto PDF downloads; robots.txt compliance; crawl rate limiting |
+| **Crawler blocked by insurers** | High | Medium | Rotate user agents; use delays; switch to manual upload if blocked |
 | **OCR accuracy < 95%** | Critical | Medium | Use Upstage Document Parse (best Korean OCR); manual review for low confidence |
 | **LLM hallucination** | Critical | High | 4-layer validation; rule-based override for critical data |
 | **Parsing fails on complex layouts** | High | Medium | Graceful degradation; flag for manual review; iteratively improve patterns |
 | **Neo4j performance** | Medium | Low | Batch inserts; proper indexing; monitor query performance |
-| **API costs exceed budget** | Medium | Medium | Cache embeddings; use Solar Pro over GPT-4o; monitor usage |
+| **API costs exceed budget** | Medium | Medium | Cache embeddings; use Solar Pro over GPT-4o; selective learning via curation |
 
 ---
 
 ## Sprint Recommendations
 
+### Sprint 0 (2 weeks) - NEW: Human-in-the-Loop Foundation
+- Story 1.0 (Metadata Crawler & Admin Dashboard)
+  - Backend: policy_metadata table, crawler implementation
+  - Frontend: admin dashboard UI
+  - Integration: crawler → DB → dashboard → queue
+
 ### Sprint 1 (2 weeks)
-- Story 1.1 (Upload & Job Management)
-- Story 1.2 (OCR)
-- Story 1.3 (Parsing) - Start
+- Story 1.0 (Complete & Test with real insurers)
+- Story 1.1 (Upload & Job Management - integrate with metadata queue)
+- Story 1.2 (OCR) - Start
 
 ### Sprint 2 (2 weeks)
-- Story 1.3 (Parsing) - Complete
-- Story 1.4 (Critical Data Extraction)
-- Story 1.5 (LLM Extraction) - Start
+- Story 1.2 (OCR) - Complete
+- Story 1.3 (Parsing)
+- Story 1.4 (Critical Data Extraction) - Start
 
 ### Sprint 3 (2 weeks)
-- Story 1.5 (LLM Extraction) - Complete
+- Story 1.4 (Critical Data Extraction) - Complete
+- Story 1.5 (LLM Extraction)
 - Story 1.6 (Entity Linking)
-- Story 1.7 (Graph Construction) - Start
 
 ### Sprint 4 (2 weeks)
-- Story 1.7 (Graph Construction) - Complete
+- Story 1.7 (Graph Construction)
 - Story 1.8 (Orchestration)
 - Story 1.9 (Validation)
 
@@ -1015,8 +1192,12 @@ Story 1.9 (Validation)
 
 | Metric | Target | Measurement |
 |--------|--------|-------------|
+| **Metadata Discovery Rate** | 100+ policies/week | Crawler logs |
+| **Legal Compliance** | 0 robots.txt violations | Crawler audit logs |
+| **Curation Efficiency** | Admin can review 50+ policies in < 10 min | User testing |
+| **Queue-to-Complete Time** | < 10 min/policy | End-to-end pipeline monitoring |
 | **Ingestion Accuracy** | > 95% | Manual validation on 10 test policies |
-| **Ingestion Speed** | < 5 min/policy | Automated benchmarking |
+| **Ingestion Speed** | < 5 min/policy (processing time) | Automated benchmarking |
 | **API Cost** | < $50/policy | CloudWatch cost monitoring |
 | **Critical Data Accuracy** | 100% | Automated validation tests |
 | **LLM Confidence** | > 0.85 avg | Logged in database |
