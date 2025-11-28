@@ -6,7 +6,7 @@ API v1의 모든 엔드포인트를 통합하는 라우터.
 from fastapi import APIRouter, status
 from loguru import logger
 
-from app.api.v1.endpoints import query, documents, auth, monitoring, graph, crawler
+from app.api.v1.endpoints import query, documents, auth, monitoring, graph, crawler, metadata
 from app.api.v1.models.query import HealthCheckResponse
 from app.services.orchestration.query_orchestrator import QueryOrchestrator
 
@@ -16,6 +16,9 @@ api_router = APIRouter()
 
 # Auth endpoints
 api_router.include_router(auth.router)
+
+# Metadata endpoints (Human-in-the-Loop)
+api_router.include_router(metadata.router)
 
 # Query endpoints
 api_router.include_router(query.router)
@@ -108,5 +111,8 @@ async def root():
             "document_detail": "/api/v1/documents/{document_id}",
             "document_content": "/api/v1/documents/{document_id}/content",
             "document_stats": "/api/v1/documents/stats/summary",
+            "metadata_policies": "/api/v1/metadata/policies",
+            "metadata_queue": "/api/v1/metadata/queue",
+            "metadata_stats": "/api/v1/metadata/stats",
         },
     }
