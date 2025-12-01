@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation'
 import { Menu, Transition } from '@headlessui/react'
 import {
   Bars3Icon,
-  BellIcon,
   UserCircleIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
 } from '@heroicons/react/24/outline'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { ThemeToggle } from './ThemeToggle'
+import NotificationBell from './NotificationBell'
 
 interface HeaderProps {
   onMenuClick: () => void
@@ -50,12 +50,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
           {/* Theme Toggle */}
           <ThemeToggle />
 
-          {/* Notifications */}
-          <button className="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-dark-hover relative">
-            <BellIcon className="w-6 h-6" />
-            {/* Notification badge */}
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-          </button>
+          {/* Notifications - Task D */}
+          <NotificationBell />
 
           {/* User menu */}
           <Menu as="div" className="relative">
