@@ -43,7 +43,7 @@ steps:
       - '--max-instances'
       - '10'
       - '--min-instances'
-      - '1'
+      - '2'  # Keep at least 2 warm instances to reduce cold starts (tune as needed)
       - '--timeout'
       - '300'
       - '--set-env-vars'

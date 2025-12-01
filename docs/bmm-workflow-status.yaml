@@ -1,0 +1,66 @@
+# Workflow Status - InsureGraph Pro
+# BMad Method Workflow Tracking
+
+# This tracks progress through BMM methodology Analysis, Planning, and Solutioning phases.
+# Implementation phase is tracked separately in sprint-status.yaml
+
+# STATUS DEFINITIONS:
+# ==================
+# Initial Status (before completion):
+#   - required: Must be completed to progress
+#   - optional: Can be completed but not required
+#   - recommended: Strongly suggested but not required
+#   - conditional: Required only if certain conditions met (e.g., if_has_ui)
+#
+# Completion Status:
+#   - {file-path}: File created/found (e.g., "docs/product-brief.md")
+#   - skipped: Optional/conditional workflow that was skipped
+
+generated: "2025-11-30"
+project: "12_InsureGraph Pro"
+selected_track: "bmad-method"
+field_type: "greenfield"
+workflow_path: "method-greenfield"
+
+# Workflow Status Tracking
+workflow_status:
+  # Phase 0: Discovery (Optional)
+  phase_0_discovery:
+    brainstorm-project: skipped
+    research: skipped
+    product-brief: skipped
+
+  # Phase 1: Planning
+  phase_1_planning:
+    prd: "prd.md"
+    validate-prd: skipped
+    create-design: skipped  # No UX design created
+
+  # Phase 2: Solutioning
+  phase_2_solutioning:
+    create-architecture: "docs/architecture.md"
+    create-epics-and-stories: "docs/epics/"
+    test-design: skipped
+    validate-architecture: skipped
+    implementation-readiness: "docs/implementation-readiness-report-2025-11-30.md"
+
+  # Phase 3: Implementation
+  phase_3_implementation:
+    sprint-planning: required  # After implementation-readiness
+
+# Current Phase
+current_phase: "phase_3_implementation"
+next_workflow: "sprint-planning"
+next_agent: "sm"
+next_command: "/bmad:bmm:workflows:sprint-planning"
+
+# Notes
+notes: |
+  프로젝트는 이미 PRD, Architecture, Epics 작업이 완료되었습니다.
+  다음 단계는 implementation-readiness 검증 후 sprint-planning입니다.
+
+  현재 구현된 Stories:
+  - Backend: Story 1.0 ~ 3.5
+  - Frontend: Story 1 ~ 6
+
+  하지만 공식 BMM sprint-status.yaml이 없으므로 sprint-planning 워크플로우를 실행하여 생성해야 합니다.

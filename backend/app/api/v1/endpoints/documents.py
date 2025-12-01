@@ -30,7 +30,7 @@ from app.api.v1.models.document import (
     DocumentType,
     ProcessingJobStatus,
 )
-from app.core.database import get_pg_connection, get_pg_pool, neo4j_manager
+from app.core.database import get_pg_connection, neo4j_manager
 from app.services.pdf_processor import pdf_processor
 from app.services.knowledge_graph import create_knowledge_graph
 # Temporarily disabled Celery to fix server restart loop

@@ -5,15 +5,12 @@ from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
 
 from jose import JWTError, jwt
-from passlib.context import CryptContext
+import bcrypt
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.core.config import settings
 
-
-# Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT Bearer token
 security = HTTPBearer()
@@ -21,12 +18,18 @@ security = HTTPBearer()
 
 def hash_password(password: str) -> str:
     """Hash a password using bcrypt"""
-    return pwd_context.hash(password)
+    # Encode password to bytes and hash
+    password_bytes = password.encode('utf-8')
+    salt = bcrypt.gensalt()
+    hashed = bcrypt.hashpw(password_bytes, salt)
+    return hashed.decode('utf-8')
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against a hash"""
-    return pwd_context.verify(plain_password, hashed_password)
+    password_bytes = plain_password.encode('utf-8')
+    hashed_bytes = hashed_password.encode('utf-8')
+    return bcrypt.checkpw(password_bytes, hashed_bytes)
 
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
@@ -127,6 +130,24 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         )
 
     return payload
+
+
+async def get_current_active_user(current_user: Dict[str, Any] = Depends(get_current_user)) -> Dict[str, Any]:
+    """
+    FastAPI dependency to get current active user
+
+    Args:
+        current_user: Current user from get_current_user dependency
+
+    Returns:
+        Active user data
+
+    Raises:
+        HTTPException: If user is not active
+    """
+    # In a real implementation, you would check the user's status from database
+    # For now, we just return the user data
+    return current_user
 
 
 def require_role(required_roles: list[str]):

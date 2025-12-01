@@ -5,6 +5,7 @@ Celery Application Configuration
 """
 import os
 from celery import Celery
+from celery.schedules import crontab
 from app.core.config import settings
 
 # Celery 인스턴스 생성
@@ -27,6 +28,26 @@ celery_app.conf.update(
     worker_prefetch_multiplier=1,
     worker_max_tasks_per_child=1000,
 )
+
+# Celery Beat 스케줄 설정 (Story 1.0)
+celery_app.conf.beat_schedule = {
+    # 매일 새벽 2시에 모든 보험사 크롤링
+    "crawl-all-insurers-daily": {
+        "task": "crawler.crawl_all_insurers",
+        "schedule": crontab(hour=2, minute=0),  # 매일 02:00 KST
+        "options": {
+            "expires": 3600,  # 1시간 후 만료
+        },
+    },
+    # 매주 일요일 새벽 3시에 오래된 다운로드 파일 정리
+    "cleanup-old-downloads-weekly": {
+        "task": "downloader.cleanup_old_downloads",
+        "schedule": crontab(day_of_week=0, hour=3, minute=0),  # 일요일 03:00 KST
+        "options": {
+            "expires": 1800,  # 30분 후 만료
+        },
+    },
+}
 
 # Task 자동 발견
 celery_app.autodiscover_tasks(["app.tasks"])

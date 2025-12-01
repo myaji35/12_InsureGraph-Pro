@@ -1,0 +1,225 @@
+<story-context id=".bmad/bmm/workflows/4-implementation/story-context/template" v="1.0">
+  <metadata>
+    <epicId>1</epicId>
+    <storyId>1.1</storyId>
+    <title>PDF Upload & Job Management</title>
+    <status>drafted</status>
+    <generatedAt>2025-11-30</generatedAt>
+    <generator>BMAD Story Context Workflow</generator>
+    <sourceStoryPath>docs/sprint-artifacts/1-1-pdf-upload-job-management.md</sourceStoryPath>
+  </metadata>
+
+  <story>
+    <asA>Admin user</asA>
+    <iWant>to upload insurance policy PDFs and track ingestion progress</iWant>
+    <soThat>I can build the knowledge graph with minimal manual intervention</soThat>
+    <tasks>
+      - Implement POST /api/v1/policies/ingest endpoint (FastAPI handler, validation, job creation, S3 upload, 202 response)
+      - Setup S3 bucket with encryption (AES-256), IAM roles, versioning, lifecycle rules
+      - Create ingestion_jobs table schema (columns: job_id, policy_name, insurer, status, progress, results, timestamps; indexes; Alembic migration)
+      - Implement job status tracking logic (GET /api/v1/policies/ingest/status/{job_id} endpoint with progress and results)
+      - Add file validation (PDF extension, 100MB max, magic bytes, error responses)
+      - Write unit tests (upload, validation, S3, database, status tracking - coverage >80%)
+      - Write integration tests (end-to-end upload+status, S3 verification, DB rollback)
+    </tasks>
+  </story>
+
+  <acceptanceCriteria>
+    1. PDF Upload with Metadata: Create job with unique job_id, return 202 Accepted with job_id and ETA, store PDF in S3 with encryption, update job status in PostgreSQL (pending → processing → completed/failed)
+
+    2. Job Status Tracking: Query endpoint returns current status (pending, processing, completed, failed), progress percentage (0-100), detailed results (nodes/edges created, errors), completion timestamp
+
+    3. File Validation: Reject invalid PDFs or files >100MB with clear error message, no job record created, return 400 Bad Request with validation details
+  </acceptanceCriteria>
+
+  <artifacts>
+    <docs>
+      <doc>
+        <path>prd.md</path>
+        <title>Product Requirements Document</title>
+        <section>Epic 1: Data Ingestion</section>
+        <snippet>Feature 1.1: Intelligent OCR & Parsing - Admin uploads PDF, triggers ingestion pipeline with job tracking</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>API Architecture</section>
+        <snippet>RESTful with /api/v1/ versioning, JWT auth, 202 Accepted for async operations, JSON error handling</snippet>
+      </doc>
+      <doc>
+        <path>docs/architecture.md</path>
+        <title>Architecture Document</title>
+        <section>Component Responsibilities</section>
+        <snippet>S3 for PDF file storage, PostgreSQL for metadata/audit logs, separation of concerns (files vs metadata)</snippet>
+      </doc>
+      <doc>
+        <path>docs/epics/epic-01-data-ingestion.md</path>
+        <title>Epic 1: Story 1.1</title>
+        <section>PDF Upload & Job Management</section>
+        <snippet>POST /api/v1/policies/ingest creates job, stores in S3, tracks status; GET /api/v1/policies/ingest/status/{job_id} returns progress</snippet>
+      </doc>
+    </docs>
+    <code>
+      <artifact>
+        <path>backend/app/api/v1/endpoints/metadata.py</path>
+        <kind>endpoint</kind>
+        <symbol>MetadataRouter</symbol>
+        <lines>1-600</lines>
+        <reason>Reference for API endpoint patterns, pagination, filtering, role-based access (ADMIN, FP_MANAGER)</reason>
+      </artifact>
+      <artifact>
+        <path>backend/app/models/policy_metadata.py</path>
+        <kind>model</kind>
+        <symbol>PolicyMetadata</symbol>
+        <lines>1-219</lines>
+        <reason>Database model pattern with status enum, timestamps, validation methods (can_be_queued, update_status)</reason>
+      </artifact>
+      <artifact>
+        <path>backend/app/api/v1/endpoints/auth.py</path>
+        <kind>endpoint</kind>
+        <symbol>AuthRouter</symbol>
+        <lines>all</lines>
+        <reason>JWT authentication pattern to reuse for protecting ingest endpoints</reason>
+      </artifact>
+      <artifact>
+        <path>backend/app/models/user.py</path>
+        <kind>model</kind>
+        <symbol>User</symbol>
+        <lines>all</lines>
+        <reason>User model with RBAC roles for authorization checks</reason>
+      </artifact>
+    </code>
+    <dependencies>
+      <python>
+        <package name="fastapi" version="0.109.0"/>
+        <package name="pydantic" version="2.5.3"/>
+        <package name="psycopg2-binary" version="2.9.9"/>
+        <package name="google-cloud-storage" version="2.14.0"/>
+        <package name="python-jose" version="3.3.0"/>
+        <package name="pytest" version="7.4.4"/>
+        <package name="pytest-asyncio" version="0.23.3"/>
+        <package name="httpx" version="0.26.0"/>
+      </python>
+    </dependencies>
+  </artifacts>
+
+  <constraints>
+    - API versioning mandatory: all endpoints under /api/v1/
+    - JWT authentication required for all endpoints
+    - Return 202 Accepted for async operations (not 200 OK)
+    - Use Pydantic models for request/response validation
+    - Follow existing naming: table=ingestion_jobs (snake_case), Model=IngestionJob (PascalCase), endpoint=/policies/ingest (kebab-case)
+    - S3 encryption: server-side (SSE-S3 or SSE-KMS), no public access
+    - IAM roles: least privilege principle
+    - Database: use Alembic for migrations, follow existing pattern from 001_add_policy_metadata_table.sql
+    - Status lifecycle: pending → processing → completed/failed (align with existing status enums)
+    - File size limit: 100MB maximum
+    - PDF validation: check extension, magic bytes (%PDF-), MIME type
+    - Error handling: return structured JSON errors with appropriate HTTP status codes
+    - Logging: structured logging for debugging (JSON format)
+  </constraints>
+
+  <interfaces>
+    <interface>
+      <name>POST /api/v1/policies/ingest</name>
+      <kind>REST endpoint</kind>
+      <signature>
+        Request: multipart/form-data
+        - file: UploadFile (PDF, max 100MB)
+        - insurer: str
+        - product_name: str
+        - launch_date: date (ISO 8601)
+
+        Response: 202 Accepted
+        {
+          "job_id": "uuid",
+          "status": "pending",
+          "estimated_completion_minutes": 5,
+          "created_at": "2025-11-30T10:00:00Z"
+        }
+      </signature>
+      <path>backend/app/api/v1/endpoints/</path>
+    </interface>
+    <interface>
+      <name>GET /api/v1/policies/ingest/status/{job_id}</name>
+      <kind>REST endpoint</kind>
+      <signature>
+        Request: path param job_id (UUID)
+
+        Response: 200 OK
+        {
+          "job_id": "uuid",
+          "status": "processing|completed|failed|pending",
+          "progress": 0-100,
+          "results": {
+            "nodes_created": 0,
+            "edges_created": 0,
+            "errors": []
+          },
+          "completed_at": "2025-11-30T10:05:00Z" | null
+        }
+      </signature>
+      <path>backend/app/api/v1/endpoints/</path>
+    </interface>
+    <interface>
+      <name>IngestionJob (SQLAlchemy Model)</name>
+      <kind>Database model</kind>
+      <signature>
+        Table: ingestion_jobs
+        Columns:
+        - id: UUID (PK)
+        - job_id: UUID (unique, indexed)
+        - policy_name: String
+        - insurer: String
+        - s3_key: String (file path in S3)
+        - status: Enum(pending, processing, completed, failed)
+        - progress: Integer (0-100)
+        - results: JSONB (nodes_created, edges_created, errors)
+        - created_at: Timestamp
+        - updated_at: Timestamp
+        - completed_at: Timestamp (nullable)
+      </signature>
+      <path>backend/app/models/ingestion_job.py</path>
+    </interface>
+    <interface>
+      <name>S3StorageService</name>
+      <kind>Service class</kind>
+      <signature>
+        class S3StorageService:
+          async def upload_pdf(file: UploadFile, key: str) -> str:
+            """Upload PDF to S3 with encryption, return S3 URI"""
+
+          async def get_signed_url(key: str, expiration: int = 3600) -> str:
+            """Generate presigned URL for download"""
+      </signature>
+      <path>backend/app/services/storage.py</path>
+    </interface>
+  </interfaces>
+
+  <tests>
+    <standards>
+      Use pytest framework with async support (pytest-asyncio). Mock external dependencies (S3, database) in unit tests. Integration tests should use real database (test DB) but mock S3. Achieve >80% code coverage. Follow AAA pattern (Arrange-Act-Assert). Use fixtures for common setup (test client, DB session, mock files).
+    </standards>
+    <locations>
+      - backend/tests/unit/api/test_ingest.py
+      - backend/tests/integration/test_s3_upload.py
+      - backend/tests/unit/models/test_ingestion_job.py
+      - backend/tests/unit/services/test_storage.py
+    </locations>
+    <ideas>
+      - AC#1: Test successful PDF upload (valid file, metadata) returns 202 with job_id
+      - AC#1: Test S3 upload with encryption (verify SSE-S3 header)
+      - AC#1: Test job record created in database with correct initial status (pending)
+      - AC#2: Test status endpoint returns correct progress for processing job
+      - AC#2: Test status endpoint returns results for completed job (nodes, edges)
+      - AC#2: Test status endpoint returns error details for failed job
+      - AC#3: Test file validation rejects non-PDF files (400 Bad Request)
+      - AC#3: Test file validation rejects files >100MB (400 Bad Request)
+      - AC#3: Test PDF magic bytes validation (%PDF-)
+      - Integration: Test end-to-end upload → status check → verify S3 file exists
+      - Integration: Test database rollback on S3 upload failure
+      - Security: Test endpoint requires authentication (401 Unauthorized)
+      - Security: Test non-admin user cannot upload (403 Forbidden)
+    </ideas>
+  </tests>
+</story-context>

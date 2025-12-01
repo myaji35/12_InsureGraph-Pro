@@ -72,7 +72,8 @@ def download_and_ingest_policy_task(self, job_id: str) -> Dict[str, Any]:
 
         # Trigger ingestion pipeline
         logger.info(f"Triggering ingestion pipeline for {file_path}")
-        ingestion_result = _trigger_ingestion_pipeline(file_path, job)
+        import asyncio
+        ingestion_result = asyncio.run(_trigger_ingestion_pipeline(file_path, job))
 
         # Update status: PROCESSING -> COMPLETED
         _update_policy_status(policy_metadata_id, PolicyMetadataStatus.COMPLETED)
@@ -212,7 +213,7 @@ def _download_file(download_url: str, job: Dict[str, Any]) -> Path:
     return file_path
 
 
-def _trigger_ingestion_pipeline(
+async def _trigger_ingestion_pipeline(
     file_path: Path,
     job: Dict[str, Any]
 ) -> Dict[str, Any]:
@@ -226,27 +227,63 @@ def _trigger_ingestion_pipeline(
     Returns:
         Ingestion results
     """
-    # TODO: Integrate with existing LangGraph ingestion workflow
-    # from app.workflows.ingestion_workflow import run_ingestion_workflow
-    #
-    # result = await run_ingestion_workflow(
-    #     file_path=str(file_path),
-    #     metadata={
-    #         "insurer": job["metadata"]["insurer"],
-    #         "product_name": job["metadata"]["policy_name"],
-    #         "launch_date": job["metadata"]["publication_date"],
-    #     }
-    # )
+    try:
+        from app.workflows.ingestion_workflow import IngestionWorkflow
+        from app.workflows.state import PipelineState, WorkflowConfig
+        from uuid import uuid4
 
-    # For now, return a mock result
-    logger.warning("Ingestion pipeline integration not yet implemented")
+        logger.info(f"Starting ingestion pipeline for {file_path}")
 
-    return {
-        "status": "mocked",
-        "nodes_created": 0,
-        "edges_created": 0,
-        "message": "Ingestion pipeline not yet connected"
-    }
+        # 워크플로우 설정 준비
+        config = WorkflowConfig(
+            generate_embeddings=False,  # 임베딩은 필요시 활성화
+            use_cascade=True,
+            use_fuzzy_matching=True,
+            fuzzy_threshold=0.85,
+            verbose=True,
+        )
+
+        # 초기 상태 생성
+        initial_state = PipelineState(
+            pipeline_id=str(uuid4()),
+            pdf_path=str(file_path),
+            product_info={
+                "insurer": job.get("metadata", {}).get("insurer", "Unknown"),
+                "product_name": job.get("metadata", {}).get("policy_name", "Unknown Policy"),
+                "launch_date": job.get("metadata", {}).get("publication_date"),
+                "category": job.get("metadata", {}).get("category"),
+            },
+        )
+
+        # 워크플로우 실행
+        workflow = IngestionWorkflow(config=config)
+        final_state = await workflow.run(initial_state)
+
+        # 결과 반환
+        result = {
+            "status": final_state.status.value,
+            "pipeline_id": final_state.pipeline_id,
+            "nodes_created": final_state.graph_stats.get("total_nodes", 0) if final_state.graph_stats else 0,
+            "edges_created": final_state.graph_stats.get("total_relationships", 0) if final_state.graph_stats else 0,
+            "duration_seconds": final_state.get_total_duration(),
+            "progress": final_state.get_progress_percentage(),
+        }
+
+        logger.info(
+            f"Ingestion pipeline completed: {result['status']}, "
+            f"{result['nodes_created']} nodes, {result['edges_created']} edges"
+        )
+
+        return result
+
+    except Exception as e:
+        logger.error(f"Ingestion pipeline failed: {e}")
+        return {
+            "status": "failed",
+            "error": str(e),
+            "nodes_created": 0,
+            "edges_created": 0,
+        }
 
 
 @celery_app.task(name="downloader.cleanup_old_downloads")

@@ -25,17 +25,26 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
+    # Connection pool & timeout (tunable)
+    POSTGRES_MIN_CONNECTIONS: int = 2
+    POSTGRES_MAX_CONNECTIONS: int = 10
+    POSTGRES_CONNECT_TIMEOUT: int = 5  # seconds
 
     # Neo4j
     NEO4J_URI: str
     NEO4J_USER: str
     NEO4J_PASSWORD: str
+    NEO4J_MAX_CONNECTION_POOL_SIZE: int = 50
+    NEO4J_CONNECTION_TIMEOUT: int = 10  # seconds
+    NEO4J_ACQUISITION_TIMEOUT: int = 120  # seconds
 
     # Redis
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
     REDIS_PASSWORD: str = ""
     REDIS_DB: int = 0
+    REDIS_SOCKET_CONNECT_TIMEOUT: int = 5  # seconds
+    REDIS_SOCKET_TIMEOUT: int = 5  # seconds
 
     # Celery
     CELERY_BROKER_URL: str = "redis://localhost:6379/1"

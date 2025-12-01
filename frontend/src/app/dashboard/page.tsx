@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import InsurerStatsGrid from "@/components/dashboard/InsurerStatsGrid";
 import InsurerDetailView from "@/components/dashboard/InsurerDetailView";
 import TimeSeriesChart from "@/components/dashboard/TimeSeriesChart";
@@ -31,6 +33,11 @@ export default function DashboardPage() {
               30개 보험사의 문서 학습 진행 상황을 한눈에 확인하세요
             </p>
           </div>
+          <Link href="/admin/metadata">
+            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              📋 정책 메타데이터 관리
+            </Button>
+          </Link>
         </div>
 
         {/* 전체 통계 요약 */}

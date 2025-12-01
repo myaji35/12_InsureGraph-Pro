@@ -18,7 +18,7 @@ class PostgreSQLManager:
     """PostgreSQL connection pool manager"""
 
     def __init__(self):
-        self.pool: ThreadedConnectionPool = None
+        self.pool: ThreadedConnectionPool | None = None
 
     def connect(self):
         """Initialize connection pool"""
@@ -27,15 +27,19 @@ class PostgreSQLManager:
         register_uuid()
 
         self.pool = ThreadedConnectionPool(
-            minconn=2,
-            maxconn=10,
+            minconn=settings.POSTGRES_MIN_CONNECTIONS,
+            maxconn=settings.POSTGRES_MAX_CONNECTIONS,
             host=settings.POSTGRES_HOST,
             port=settings.POSTGRES_PORT,
             database=settings.POSTGRES_DB,
             user=settings.POSTGRES_USER,
             password=settings.POSTGRES_PASSWORD,
+            connect_timeout=settings.POSTGRES_CONNECT_TIMEOUT,
         )
-        print("✅ PostgreSQL connection pool created")
+        print(
+            "✅ PostgreSQL connection pool created ",
+            f"(min={settings.POSTGRES_MIN_CONNECTIONS}, max={settings.POSTGRES_MAX_CONNECTIONS})",
+        )
 
     def disconnect(self):
         """Close all connections in pool"""
@@ -64,12 +68,16 @@ class Neo4jManager:
             settings.NEO4J_URI,
             auth=(settings.NEO4J_USER, settings.NEO4J_PASSWORD),
             max_connection_lifetime=3600,
-            max_connection_pool_size=50,
-            connection_acquisition_timeout=120,
+            max_connection_pool_size=settings.NEO4J_MAX_CONNECTION_POOL_SIZE,
+            connection_acquisition_timeout=settings.NEO4J_ACQUISITION_TIMEOUT,
+            connection_timeout=settings.NEO4J_CONNECTION_TIMEOUT,
         )
         # Verify connectivity
         await self.driver.verify_connectivity()
-        print("✅ Neo4j driver connected")
+        print(
+            "✅ Neo4j driver connected ",
+            f"(pool_size={settings.NEO4J_MAX_CONNECTION_POOL_SIZE})",
+        )
 
     async def disconnect(self):
         """Close Neo4j driver"""
@@ -86,7 +94,7 @@ class RedisManager:
     """Redis connection manager"""
 
     def __init__(self):
-        self.client: Redis = None
+        self.client: Redis | None = None
 
     def connect(self):
         """Initialize Redis client"""
@@ -97,7 +105,8 @@ class RedisManager:
             db=settings.REDIS_DB,
             decode_responses=True,
             socket_keepalive=True,
-            socket_connect_timeout=5,
+            socket_connect_timeout=settings.REDIS_SOCKET_CONNECT_TIMEOUT,
+            socket_timeout=settings.REDIS_SOCKET_TIMEOUT,
         )
         # Test connection
         self.client.ping()

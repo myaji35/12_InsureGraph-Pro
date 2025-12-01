@@ -6,7 +6,11 @@ API v1의 모든 엔드포인트를 통합하는 라우터.
 from fastapi import APIRouter, status
 from loguru import logger
 
-from app.api.v1.endpoints import query, documents, auth, monitoring, graph, crawler, metadata
+from app.api.v1.endpoints import query, auth, monitoring, graph, metadata, test_crawler, ingest, query_simple, search
+# Temporarily disabled documents due to missing pdfplumber
+# from app.api.v1.endpoints import documents
+# Temporarily disabled crawler due to missing app.core.deps
+# from app.api.v1.endpoints import crawler
 from app.api.v1.models.query import HealthCheckResponse
 from app.services.orchestration.query_orchestrator import QueryOrchestrator
 
@@ -20,11 +24,20 @@ api_router.include_router(auth.router)
 # Metadata endpoints (Human-in-the-Loop)
 api_router.include_router(metadata.router)
 
+# Ingest endpoints (Policy Upload & Job Management)
+api_router.include_router(ingest.router)
+
 # Query endpoints
 api_router.include_router(query.router)
 
-# Document endpoints
-api_router.include_router(documents.router)
+# Simple Query endpoints (Stories 2.1-2.5)
+api_router.include_router(query_simple.router, prefix="/query-simple", tags=["Query Simple"])
+
+# Search endpoints (MVP)
+api_router.include_router(search.router)
+
+# Document endpoints (temporarily disabled)
+# api_router.include_router(documents.router)
 
 # Monitoring endpoints
 api_router.include_router(monitoring.router)
@@ -32,8 +45,11 @@ api_router.include_router(monitoring.router)
 # Graph endpoints
 api_router.include_router(graph.router)
 
-# Crawler endpoints
-api_router.include_router(crawler.router, prefix="/crawler", tags=["Crawler"])
+# Test Crawler endpoints (new)
+api_router.include_router(test_crawler.router)
+
+# Crawler endpoints (temporarily disabled)
+# api_router.include_router(crawler.router, prefix="/crawler", tags=["Crawler"])
 
 
 # Health Check

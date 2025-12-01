@@ -5,8 +5,54 @@ import pytest
 from uuid import uuid4
 from unittest.mock import Mock, MagicMock
 import psycopg2
+from fastapi.testclient import TestClient
 
 from app.core.config import settings
+from app.main import app
+
+
+@pytest.fixture
+def client():
+    """
+    FastAPI TestClient fixture for API integration tests.
+
+    Yields:
+        TestClient: Configured test client for the app
+    """
+    with TestClient(app) as test_client:
+        yield test_client
+
+
+@pytest.fixture
+def auth_headers():
+    """
+    Mock JWT authentication headers for API tests.
+
+    Returns:
+        dict: Headers with Bearer token
+    """
+    return {
+        "Authorization": "Bearer mock-jwt-token-for-testing"
+    }
+
+
+@pytest.fixture
+def mock_auth_user():
+    """
+    Mock authenticated user for testing protected endpoints.
+
+    Returns:
+        Mock: User with ADMIN role
+    """
+    from app.models.user import User, UserRole
+
+    mock_user = Mock()
+    mock_user.user_id = "test-user-123"
+    mock_user.email = "test@example.com"
+    mock_user.role = UserRole.ADMIN
+    mock_user.is_active = True
+
+    return mock_user
 
 
 @pytest.fixture
