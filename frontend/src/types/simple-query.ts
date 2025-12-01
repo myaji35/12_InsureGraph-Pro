@@ -25,6 +25,20 @@ export interface SearchResultInfo {
   article_num?: string
 }
 
+export interface GraphNodeInfo {
+  node_id: string
+  node_type: string
+  text: string
+  properties: Record<string, any>
+}
+
+export interface GraphPathInfo {
+  nodes: GraphNodeInfo[]
+  relationships: string[]
+  path_length: number
+  relevance_score: number
+}
+
 export interface ValidationInfo {
   passed: boolean
   overall_level: string
@@ -44,6 +58,7 @@ export interface SimpleQueryResponse {
 
   // Traversal
   graph_paths_count: number
+  graph_paths: GraphPathInfo[]
 
   // Answer
   answer: string

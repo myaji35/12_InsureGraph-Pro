@@ -45,6 +45,22 @@ class SearchResultInfo(BaseModel):
     article_num: Optional[str] = None
 
 
+class GraphNodeInfo(BaseModel):
+    """Graph node info for visualization"""
+    node_id: str
+    node_type: str
+    text: str
+    properties: Dict[str, Any] = {}
+
+
+class GraphPathInfo(BaseModel):
+    """Graph path info for visualization"""
+    nodes: List[GraphNodeInfo]
+    relationships: List[str]
+    path_length: int
+    relevance_score: float
+
+
 class ValidationInfo(BaseModel):
     """Validation info"""
     passed: bool
@@ -66,6 +82,7 @@ class SimpleQueryResponse(BaseModel):
 
     # Traversal
     graph_paths_count: int
+    graph_paths: List[GraphPathInfo] = []
 
     # Answer
     answer: str
@@ -190,6 +207,23 @@ async def execute_simple_query(request: SimpleQueryRequest):
                 for r in search_results.results[:5]  # Top 5 for API
             ],
             graph_paths_count=len(graph_paths),
+            graph_paths=[
+                GraphPathInfo(
+                    nodes=[
+                        GraphNodeInfo(
+                            node_id=node.node_id,
+                            node_type=node.node_type,
+                            text=node.text[:200],  # Truncate for visualization
+                            properties=node.properties,
+                        )
+                        for node in path.nodes
+                    ],
+                    relationships=path.relationships,
+                    path_length=path.path_length,
+                    relevance_score=path.relevance_score,
+                )
+                for path in graph_paths[:10]  # Top 10 paths for visualization
+            ],
             answer=reasoning_result.answer,
             confidence=validation_result.confidence,  # Use validated confidence
             sources=reasoning_result.sources[:10],  # Top 10 sources

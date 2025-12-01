@@ -25,7 +25,9 @@ import {
   ClockIcon,
   MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline'
-import { getIntentLabel, getIntentIcon } from '@/types/simple-query'
+import { getIntentLabel, getIntentIcon, GraphNodeInfo } from '@/types/simple-query'
+import GraphVisualization from '@/components/GraphVisualization'
+import NodeDetailPanel from '@/components/NodeDetailPanel'
 
 export default function SimpleQueryPage() {
   const {
@@ -44,6 +46,7 @@ export default function SimpleQueryPage() {
   const [query, setQuery] = useState('')
   const [llmProvider, setLLMProvider] = useState<'openai' | 'anthropic' | 'mock'>('mock')
   const [useTraversal, setUseTraversal] = useState(true)
+  const [selectedNode, setSelectedNode] = useState<GraphNodeInfo | null>(null)
 
   // Check health on mount
   useEffect(() => {
@@ -347,6 +350,23 @@ export default function SimpleQueryPage() {
                   </div>
                 </div>
 
+                {/* Graph Visualization */}
+                {currentResponse.graph_paths && currentResponse.graph_paths.length > 0 && (
+                  <div className="card">
+                    <h4 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                      </svg>
+                      추론 경로 그래프
+                    </h4>
+                    <GraphVisualization
+                      paths={currentResponse.graph_paths}
+                      height="500px"
+                      onNodeClick={setSelectedNode}
+                    />
+                  </div>
+                )}
+
                 {/* Search Results */}
                 {currentResponse.search_results.length > 0 && (
                   <div className="card">
@@ -453,6 +473,9 @@ export default function SimpleQueryPage() {
           </div>
         </div>
       </div>
+
+      {/* Node Detail Panel */}
+      <NodeDetailPanel node={selectedNode} onClose={() => setSelectedNode(null)} />
     </DashboardLayout>
   )
 }
