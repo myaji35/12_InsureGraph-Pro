@@ -7,6 +7,7 @@
 export interface SimpleQueryRequest {
   query: string
   policy_id?: string
+  customer_id?: string
   limit?: number
   use_traversal?: boolean
   llm_provider?: 'openai' | 'anthropic' | 'mock'

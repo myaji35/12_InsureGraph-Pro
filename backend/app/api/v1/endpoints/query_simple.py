@@ -5,9 +5,16 @@ GraphRAG 쿼리 엔진 API를 제공합니다 (간단한 버전).
 Stories 2.1-2.5를 통합한 API입니다.
 """
 from typing import Optional, List, Dict, Any
-from fastapi import APIRouter, HTTPException, Query as QueryParam
+from uuid import UUID
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Query as QueryParam, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import text
 from pydantic import BaseModel, Field
 
+from app.core.database import get_db
+from app.core.security import get_current_active_user
+from app.models.user import User
 from app.services.query_parser import get_query_parser, QueryIntent
 from app.services.local_search import get_local_search
 from app.services.graph_traversal import get_graph_traversal
@@ -25,6 +32,7 @@ class SimpleQueryRequest(BaseModel):
     """Query request"""
     query: str = Field(..., description="자연어 질문", min_length=1, max_length=500)
     policy_id: Optional[str] = Field(None, description="특정 보험 정책 ID (선택)")
+    customer_id: Optional[str] = Field(None, description="고객 ID (선택, 히스토리 추적용)")
     limit: int = Field(10, description="검색 결과 수", ge=1, le=50)
     use_traversal: bool = Field(True, description="그래프 탐색 사용 여부")
     llm_provider: str = Field("openai", description="LLM 제공자 (openai/anthropic/mock)")
@@ -103,7 +111,11 @@ class HealthResponse(BaseModel):
 # Endpoints
 
 @router.post("/execute", response_model=SimpleQueryResponse, summary="자연어 쿼리 실행 (Simple)")
-async def execute_simple_query(request: SimpleQueryRequest):
+async def execute_simple_query(
+    request: SimpleQueryRequest,
+    user: User = Depends(get_current_active_user),
+    db: AsyncSession = Depends(get_db),
+):
     """
     자연어 질문에 대한 답변을 생성합니다.
 
@@ -125,6 +137,7 @@ async def execute_simple_query(request: SimpleQueryRequest):
     ```
     """
     try:
+        start_time = datetime.utcnow()
         logger.info(f"Executing simple query: {request.query}")
 
         # 1. Parse query
@@ -235,6 +248,67 @@ async def execute_simple_query(request: SimpleQueryRequest):
                 recommendations=validation_result.recommendations,
             ),
         )
+
+        # 6. Save to query history (auto-save feature)
+        try:
+            end_time = datetime.utcnow()
+            execution_time_ms = int((end_time - start_time).total_seconds() * 1000)
+
+            # Prepare source documents for storage
+            source_docs = [
+                {
+                    "node_id": src.get("node_id"),
+                    "text": src.get("text", "")[:500],  # Limit text length
+                    "article_num": src.get("article_num"),
+                }
+                for src in reasoning_result.sources[:5]  # Store top 5 sources
+            ]
+
+            # Prepare reasoning path for storage
+            reasoning_path_data = {
+                "graph_paths_count": len(graph_paths),
+                "paths": [
+                    {
+                        "path_length": path.path_length,
+                        "relevance_score": path.relevance_score,
+                        "node_types": [node.node_type for node in path.nodes],
+                    }
+                    for path in graph_paths[:3]  # Store top 3 paths
+                ]
+            } if graph_paths else None
+
+            # Insert into query_history
+            save_query = text("""
+                INSERT INTO query_history (
+                    user_id, customer_id, query_text, intent, answer,
+                    confidence, source_documents, reasoning_path, execution_time_ms
+                )
+                VALUES (
+                    :user_id, :customer_id, :query_text, :intent, :answer,
+                    :confidence, :source_documents, :reasoning_path, :execution_time_ms
+                )
+            """)
+
+            await db.execute(
+                save_query,
+                {
+                    "user_id": str(user.user_id),
+                    "customer_id": request.customer_id if request.customer_id else None,
+                    "query_text": request.query,
+                    "intent": parsed_query.intent.value,
+                    "answer": reasoning_result.answer[:1000],  # Limit answer length
+                    "confidence": float(validation_result.confidence),
+                    "source_documents": source_docs,
+                    "reasoning_path": reasoning_path_data,
+                    "execution_time_ms": execution_time_ms,
+                },
+            )
+            await db.commit()
+            logger.info(f"Saved query history for user {user.user_id}")
+        except Exception as save_error:
+            logger.warning(f"Failed to save query history: {save_error}")
+            # Don't fail the request if history save fails
+            await db.rollback()
 
         return response
 
