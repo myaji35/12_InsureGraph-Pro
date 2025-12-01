@@ -6,7 +6,7 @@ API v1의 모든 엔드포인트를 통합하는 라우터.
 from fastapi import APIRouter, status
 from loguru import logger
 
-from app.api.v1.endpoints import query, auth, monitoring, graph, metadata, test_crawler, ingest, query_simple, search
+from app.api.v1.endpoints import query, auth, monitoring, graph, metadata, test_crawler, ingest, query_simple, search, customers
 # Temporarily disabled documents due to missing pdfplumber
 # from app.api.v1.endpoints import documents
 # Temporarily disabled crawler due to missing app.core.deps
@@ -32,6 +32,9 @@ api_router.include_router(query.router)
 
 # Simple Query endpoints (Stories 2.1-2.5)
 api_router.include_router(query_simple.router, prefix="/query-simple", tags=["Query Simple"])
+
+# Customer endpoints (Story 3.4)
+api_router.include_router(customers.router, prefix="/customers", tags=["Customers"])
 
 # Search endpoints (MVP)
 api_router.include_router(search.router)
