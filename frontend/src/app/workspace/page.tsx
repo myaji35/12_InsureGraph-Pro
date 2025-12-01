@@ -12,6 +12,8 @@ import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { fetchDashboardOverview } from '@/lib/analytics-api'
 import { DashboardOverview } from '@/types/analytics'
+import { getQueryStats } from '@/lib/query-history-api'
+import { QueryHistoryStats } from '@/types/query-history'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
@@ -19,24 +21,51 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8']
 export default function WorkspacePage() {
   const router = useRouter()
   const [overview, setOverview] = useState<DashboardOverview | null>(null)
+  const [queryStats, setQueryStats] = useState<QueryHistoryStats | null>(null)
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [autoRefresh, setAutoRefresh] = useState(true)
 
+  // Enhancement #3: Auto-refresh every 30 seconds
   useEffect(() => {
     loadDashboard()
-  }, [])
 
-  const loadDashboard = async () => {
+    if (autoRefresh) {
+      const interval = setInterval(() => {
+        loadDashboard(true) // Silent refresh
+      }, 30000) // 30 seconds
+
+      return () => clearInterval(interval)
+    }
+  }, [autoRefresh])
+
+  const loadDashboard = async (silent: boolean = false) => {
     try {
-      setLoading(true)
+      if (!silent) {
+        setLoading(true)
+      } else {
+        setRefreshing(true)
+      }
       setError(null)
-      const data = await fetchDashboardOverview()
-      setOverview(data)
+      const [overviewData, statsData] = await Promise.all([
+        fetchDashboardOverview(),
+        getQueryStats().catch(() => null), // Query stats is optional
+      ])
+      setOverview(overviewData)
+      setQueryStats(statsData)
+      setLastUpdated(new Date())
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load dashboard')
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
+  }
+
+  const handleManualRefresh = () => {
+    loadDashboard(false)
   }
 
   const formatDate = (dateString?: string) => {
@@ -56,14 +85,67 @@ export default function WorkspacePage() {
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header - Enhancement #3: Real-time Updates */}
         <div className="mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
-            FP 워크스페이스
-          </h2>
-          <p className="mt-2 text-gray-600 dark:text-gray-400">
-            고객 관리 및 성과 지표를 한눈에 확인하세요
-          </p>
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                FP 워크스페이스
+              </h2>
+              <p className="mt-2 text-gray-600 dark:text-gray-400">
+                고객 관리 및 성과 지표를 한눈에 확인하세요
+              </p>
+              {lastUpdated && (
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
+                  마지막 업데이트: {lastUpdated.toLocaleTimeString('ko-KR')}
+                  {refreshing && (
+                    <span className="ml-2 inline-flex items-center">
+                      <svg className="animate-spin h-3 w-3 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span className="ml-1">갱신 중...</span>
+                    </span>
+                  )}
+                </p>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              {/* Auto-refresh toggle */}
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                  className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  자동 갱신 (30초)
+                </span>
+              </label>
+              {/* Manual refresh button */}
+              <button
+                onClick={handleManualRefresh}
+                disabled={loading || refreshing}
+                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg
+                  className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
+                </svg>
+                <span className="text-sm">새로고침</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         {loading ? (
@@ -168,6 +250,114 @@ export default function WorkspacePage() {
                 </div>
               )}
             </div>
+
+            {/* Query History Stats - Enhancement #2 */}
+            {queryStats && (
+              <div className="card">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    질의 통계
+                  </h3>
+                  <button
+                    onClick={() => router.push('/query-history')}
+                    className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+                  >
+                    전체 보기 →
+                  </button>
+                </div>
+
+                {/* Query Count Stats */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                  <div className="text-center p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                    <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                      {queryStats.total_queries}
+                    </p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      총 질의
+                    </p>
+                  </div>
+                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                    <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                      {queryStats.queries_today}
+                    </p>
+                    <p className="text-sm text-blue-600 dark:text-blue-400 mt-1">
+                      오늘
+                    </p>
+                  </div>
+                  <div className="text-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {queryStats.queries_this_week}
+                    </p>
+                    <p className="text-sm text-green-600 dark:text-green-400 mt-1">
+                      이번 주
+                    </p>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                      {queryStats.queries_this_month}
+                    </p>
+                    <p className="text-sm text-purple-600 dark:text-purple-400 mt-1">
+                      이번 달
+                    </p>
+                  </div>
+                </div>
+
+                {/* Average Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  {queryStats.avg_confidence !== null && queryStats.avg_confidence !== undefined && (
+                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        평균 신뢰도
+                      </span>
+                      <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {(queryStats.avg_confidence * 100).toFixed(1)}%
+                      </span>
+                    </div>
+                  )}
+                  {queryStats.avg_execution_time_ms && (
+                    <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        평균 응답 시간
+                      </span>
+                      <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        {(queryStats.avg_execution_time_ms / 1000).toFixed(2)}초
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Top Intents */}
+                {queryStats.top_intents.length > 0 && (
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      주요 질의 유형
+                    </h4>
+                    <div className="space-y-2">
+                      {queryStats.top_intents.map((item, idx) => (
+                        <div key={idx} className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">
+                            {item.intent || '기타'}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-primary-600"
+                                style={{
+                                  width: `${(item.count / queryStats.total_queries) * 100}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100 w-8 text-right">
+                              {item.count}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Recent Customers */}
             <div className="card">
