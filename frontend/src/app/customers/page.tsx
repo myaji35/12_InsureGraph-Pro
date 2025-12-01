@@ -11,9 +11,11 @@ import { useRouter } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { fetchCustomers, createCustomer, deleteCustomer } from '@/lib/customer-api'
 import { Customer, CustomerCreateInput, Gender } from '@/types/customer'
+import { useToast } from '@/components/Toast'
 
 export default function CustomersPage() {
   const router = useRouter()
+  const toast = useToast()
   const [customers, setCustomers] = useState<Customer[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -59,12 +61,13 @@ export default function CustomersPage() {
   const handleAddCustomer = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!formData.consent_given) {
-      alert('고객 동의가 필요합니다')
+      toast.warning('고객 동의가 필요합니다')
       return
     }
 
     try {
       await createCustomer(formData)
+      toast.success('고객이 성공적으로 추가되었습니다')
       setShowAddModal(false)
       setFormData({
         name: '',
@@ -78,7 +81,7 @@ export default function CustomersPage() {
       })
       loadCustomers()
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to create customer')
+      toast.error(err instanceof Error ? err.message : '고객 추가에 실패했습니다')
     }
   }
 
@@ -89,9 +92,10 @@ export default function CustomersPage() {
 
     try {
       await deleteCustomer(customerId)
+      toast.success('고객이 삭제되었습니다')
       loadCustomers()
     } catch (err) {
-      alert('Failed to delete customer')
+      toast.error('고객 삭제에 실패했습니다')
     }
   }
 

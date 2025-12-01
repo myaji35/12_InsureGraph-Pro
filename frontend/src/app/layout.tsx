@@ -6,6 +6,8 @@ import { ThemeProvider } from '@/providers/theme-provider'
 import { QueryProvider } from '@/providers/query-provider'
 import { Toaster } from '@/lib/toast-config'
 import { CyberParticles } from '@/components/CyberParticles'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import { ToastProvider, ToastContainer } from '@/components/Toast'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
@@ -37,8 +39,13 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              {children}
-              <Toaster />
+              <ErrorBoundary>
+                <ToastProvider>
+                  {children}
+                  <ToastContainer />
+                  <Toaster />
+                </ToastProvider>
+              </ErrorBoundary>
             </ThemeProvider>
           </QueryProvider>
         </ClerkProvider>
