@@ -19,6 +19,20 @@ export const metadata: Metadata = {
   description: 'GraphRAG-powered insurance policy analysis platform for Financial Planners',
   icons: {
     icon: '/favicon.svg',
+    apple: '/icon-192x192.png',
+  },
+  manifest: '/manifest.json',
+  themeColor: '#0ea5e9',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 5,
+    userScalable: true,
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'InsureGraph Pro',
   },
 }
 

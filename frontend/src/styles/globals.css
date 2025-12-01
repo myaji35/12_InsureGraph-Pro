@@ -325,3 +325,69 @@
 .animate-slide-out-right {
   animation: slide-out-right 0.3s ease-in forwards;
 }
+
+/* Mobile touch optimizations - Story 3.6 */
+@layer utilities {
+  /* Minimum touch target size (44x44px) */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Smooth scrolling on mobile */
+  .scroll-smooth-mobile {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Prevent text selection on tap (for buttons) */
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
+
+  /* Safe area padding for notched devices */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .safe-left {
+    padding-left: env(safe-area-inset-left);
+  }
+
+  .safe-right {
+    padding-right: env(safe-area-inset-right);
+  }
+}
+
+/* PWA standalone mode adjustments */
+@media (display-mode: standalone) {
+  body {
+    /* Add safe area padding for PWA mode */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Mobile responsive breakpoints (already using Tailwind, but adding explicit media queries for special cases) */
+@media (max-width: 640px) {
+  /* Increase tap target sizes on mobile */
+  button,
+  a,
+  [role="button"] {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Better table scrolling on mobile */
+  table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
