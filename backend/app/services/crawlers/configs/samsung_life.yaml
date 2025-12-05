@@ -1,0 +1,44 @@
+# Samsung Life Insurance Crawler Configuration
+# 삼성생명 보험 약관 크롤러 설정
+
+insurer_code: samsung_life
+insurer_name: 삼성생명
+base_url: https://www.samsunglife.com
+product_list_url: https://www.samsunglife.com/product/list
+
+# Crawling Method
+crawl_method: dynamic_js  # static_html | dynamic_js | api | hybrid
+auth_method: none  # none | basic | oauth | session | api_key
+
+# CSS Selectors (실제 웹사이트 구조에 맞게 수정 필요)
+product_list_selector: .product-list .product-item
+product_name_selector: .product-name
+product_category_selector: .product-category
+download_link_selector: a.download-pdf
+
+# Pagination
+has_pagination: true
+pagination_selector: .pagination .next
+max_pages: 50
+
+# Rate Limiting
+request_delay: 1.5  # seconds
+max_retries: 3
+
+# Custom HTTP Headers
+custom_headers:
+  Referer: https://www.samsunglife.com
+  Accept-Language: ko-KR,ko;q=0.9,en;q=0.8
+  User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36
+
+# JavaScript Rendering (for dynamic_js method)
+wait_for_selector: .product-list
+wait_timeout: 30000  # milliseconds
+
+# Additional Metadata
+metadata:
+  contact_email: customer@samsunglife.com
+  support_phone: 1588-3114
+  notes: |
+    삼성생명은 동적 JavaScript를 많이 사용하므로 Playwright 사용 권장.
+    페이지 로딩 후 최소 2초 대기 필요.

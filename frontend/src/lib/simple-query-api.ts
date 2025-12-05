@@ -6,8 +6,8 @@
 
 import type { SimpleQueryRequest, SimpleQueryResponse } from '@/types/simple-query'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
-const SIMPLE_QUERY_API = `${API_BASE_URL}/api/v1/query-simple`
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3030/api'
+const SIMPLE_QUERY_API = `${API_BASE_URL}/v1/query-simple`
 
 class SimpleQueryAPI {
   private async fetchWithAuth(url: string, options: RequestInit = {}) {

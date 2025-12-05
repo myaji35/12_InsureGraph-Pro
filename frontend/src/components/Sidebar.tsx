@@ -11,6 +11,7 @@ import {
   Cog6ToothIcon,
   CircleStackIcon,
   BuildingOfficeIcon,
+  PencilSquareIcon,
 } from '@heroicons/react/24/outline'
 
 interface NavItem {
@@ -30,22 +31,18 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const router = useRouter()
 
   const navigation: NavItem[] = [
-    { key: 'dashboard', href: `/dashboard`, icon: HomeIcon },
-    { key: 'documents', href: `/documents`, icon: DocumentTextIcon },
-    { key: 'companies', href: `/companies`, icon: BuildingOfficeIcon },
-    { key: 'query', href: `/query`, icon: ChatBubbleLeftRightIcon },
+    { key: 'admin-dashboard', href: `/admin/dashboard`, icon: BuildingOfficeIcon },
+    { key: 'fp-dashboard', href: `/fp/dashboard`, icon: UsersIcon },
+    { key: 'ask', href: `/ask`, icon: PencilSquareIcon },
     { key: 'graph', href: `/graph`, icon: CircleStackIcon },
-    { key: 'customers', href: `/customers`, icon: UsersIcon },
     { key: 'settings', href: `/settings`, icon: Cog6ToothIcon },
   ]
 
   const labels: Record<string, string> = {
-    dashboard: '대시보드',
-    documents: '문서 관리',
-    companies: '보험사 관리',
-    query: '질의응답',
+    'admin-dashboard': '보험사 관리',
+    'fp-dashboard': '고객 관리',
+    ask: '질문하기',
     graph: '그래프',
-    customers: '고객 관리',
     settings: '설정',
   }
 
@@ -71,7 +68,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 dark:border-dark-border">
-            <Link href={`/dashboard`} className="flex items-center">
+            <Link href={`/admin/dashboard`} className="flex items-center">
               <Image
                 src="/logo.png"
                 alt="InsureGraph Pro"

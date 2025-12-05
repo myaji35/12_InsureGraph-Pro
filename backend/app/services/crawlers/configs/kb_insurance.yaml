@@ -1,0 +1,48 @@
+# KB Insurance Crawler Configuration
+# KB손해보험 약관 크롤러 설정
+
+insurer_code: kb_insurance
+insurer_name: KB손해보험
+base_url: https://www.kbinsure.co.kr
+product_list_url: https://www.kbinsure.co.kr/product/list
+
+# Crawling Method
+crawl_method: hybrid  # API + 스크래핑 혼합
+auth_method: none
+
+# CSS Selectors
+product_list_selector: .insurance-list .insurance-item
+product_name_selector: .insurance-name
+product_category_selector: .insurance-type
+download_link_selector: a.btn-download
+
+# Pagination
+has_pagination: true
+pagination_selector: .page-next
+max_pages: 30
+
+# Rate Limiting
+request_delay: 1.0  # seconds
+max_retries: 3
+
+# Custom HTTP Headers
+custom_headers:
+  Referer: https://www.kbinsure.co.kr
+  Accept: application/json, text/html
+  Accept-Language: ko-KR,ko;q=0.9
+
+# JavaScript Rendering
+wait_for_selector: .insurance-list
+wait_timeout: 20000  # milliseconds
+
+# KB Insurance Specific
+metadata:
+  api_endpoint: https://api.kbinsure.co.kr/v1/products
+  requires_session: false
+  pdf_pattern: .*약관.*\.pdf$
+  contact_email: help@kbinsure.co.kr
+  support_phone: 1544-0114
+  notes: |
+    KB손해보험은 일부 API를 제공할 수 있음.
+    우선 API 시도 후 실패 시 웹 스크래핑으로 폴백.
+    여러 약관 파일이 있을 수 있으므로 "주계약" 우선 선택.

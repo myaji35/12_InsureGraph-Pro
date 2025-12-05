@@ -12,17 +12,40 @@ import type {
   NotificationType,
 } from '@/types/notification'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3030/api'
 
 /**
- * Get auth headers with JWT token
+ * Get auth headers with JWT token from Clerk
  */
 async function getAuthHeaders(): Promise<HeadersInit> {
-  const token = localStorage.getItem('access_token')
-  return {
+  const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    ...(token && { Authorization: `Bearer ${token}` }),
   }
+
+  // Try to get Clerk session token
+  if (typeof window !== 'undefined') {
+    try {
+      // @ts-ignore - Clerk global is available after initialization
+      const clerk = window.Clerk
+      if (clerk && clerk.session) {
+        const token = await clerk.session.getToken()
+        if (token) {
+          headers.Authorization = `Bearer ${token}`
+          return headers
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to get Clerk token:', error)
+    }
+
+    // Fallback to localStorage token (legacy)
+    const token = localStorage.getItem('access_token')
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
+  }
+
+  return headers
 }
 
 /**
@@ -38,7 +61,7 @@ export async function listNotifications(
   if (type) params.append('type', type)
   if (limit) params.append('limit', limit.toString())
 
-  const response = await fetch(`${API_BASE}/api/v1/notifications/?${params.toString()}`, {
+  const response = await fetch(`${API_BASE}/v1/notifications/?${params.toString()}`, {
     headers: await getAuthHeaders(),
   })
 
@@ -54,7 +77,7 @@ export async function listNotifications(
  * Create a notification
  */
 export async function createNotification(data: NotificationCreate): Promise<Notification> {
-  const response = await fetch(`${API_BASE}/api/v1/notifications/`, {
+  const response = await fetch(`${API_BASE}/v1/notifications/`, {
     method: 'POST',
     headers: await getAuthHeaders(),
     body: JSON.stringify(data),
@@ -72,7 +95,7 @@ export async function createNotification(data: NotificationCreate): Promise<Noti
  * Mark notification as read
  */
 export async function markNotificationRead(notificationId: string): Promise<Notification> {
-  const response = await fetch(`${API_BASE}/api/v1/notifications/${notificationId}/read`, {
+  const response = await fetch(`${API_BASE}/v1/notifications/${notificationId}/read`, {
     method: 'PUT',
     headers: await getAuthHeaders(),
   })
@@ -89,7 +112,7 @@ export async function markNotificationRead(notificationId: string): Promise<Noti
  * Mark all notifications as read
  */
 export async function markAllNotificationsRead(): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/v1/notifications/read-all`, {
+  const response = await fetch(`${API_BASE}/v1/notifications/read-all`, {
     method: 'PUT',
     headers: await getAuthHeaders(),
   })
@@ -104,7 +127,7 @@ export async function markAllNotificationsRead(): Promise<void> {
  * Delete notification
  */
 export async function deleteNotification(notificationId: string): Promise<void> {
-  const response = await fetch(`${API_BASE}/api/v1/notifications/${notificationId}`, {
+  const response = await fetch(`${API_BASE}/v1/notifications/${notificationId}`, {
     method: 'DELETE',
     headers: await getAuthHeaders(),
   })
@@ -119,7 +142,7 @@ export async function deleteNotification(notificationId: string): Promise<void> 
  * Get notification statistics
  */
 export async function getNotificationStats(): Promise<NotificationStats> {
-  const response = await fetch(`${API_BASE}/api/v1/notifications/stats`, {
+  const response = await fetch(`${API_BASE}/v1/notifications/stats`, {
     headers: await getAuthHeaders(),
   })
 

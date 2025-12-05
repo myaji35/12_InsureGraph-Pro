@@ -10,6 +10,8 @@ from psycopg2.extras import register_uuid
 from neo4j import GraphDatabase, AsyncGraphDatabase
 from redis import Redis
 import asyncio
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
 
 from app.core.config import settings
 
@@ -124,6 +126,23 @@ pg_manager = PostgreSQLManager()
 neo4j_manager = Neo4jManager()
 redis_manager = RedisManager()
 
+# SQLAlchemy Async Engine
+DATABASE_URL = f"postgresql+asyncpg://{settings.POSTGRES_USER}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+async_engine = create_async_engine(
+    DATABASE_URL,
+    echo=False,
+    pool_size=settings.POSTGRES_MIN_CONNECTIONS,
+    max_overflow=settings.POSTGRES_MAX_CONNECTIONS - settings.POSTGRES_MIN_CONNECTIONS,
+)
+AsyncSessionLocal = async_sessionmaker(
+    async_engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
+)
+
+# SQLAlchemy Base
+Base = declarative_base()
+
 
 # Dependency injection for FastAPI
 def get_pg_connection():
@@ -144,3 +163,12 @@ async def get_neo4j_session():
 def get_redis_client():
     """FastAPI dependency for Redis client"""
     return redis_manager.client
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """FastAPI dependency for SQLAlchemy AsyncSession"""
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        finally:
+            await session.close()

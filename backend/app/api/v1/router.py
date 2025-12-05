@@ -7,6 +7,8 @@ from fastapi import APIRouter, status
 from loguru import logger
 
 from app.api.v1.endpoints import query, auth, monitoring, graph, metadata, test_crawler, ingest, query_simple, search, customers, analytics, query_history, ga_analytics, notifications
+from app.api.v1.endpoints import documents, crawler_documents, crawler_urls, fp_customers
+from app.api.v1.endpoints import insurer_crawlers, learning_stats, knowledge, knowledge_graph, relearning
 # Temporarily disabled documents due to missing pdfplumber
 # from app.api.v1.endpoints import documents
 # Temporarily disabled crawler due to missing app.core.deps
@@ -51,8 +53,8 @@ api_router.include_router(notifications.router, prefix="/notifications", tags=["
 # Search endpoints (MVP)
 api_router.include_router(search.router)
 
-# Document endpoints (temporarily disabled)
-# api_router.include_router(documents.router)
+# Document endpoints
+api_router.include_router(documents.router)
 
 # Monitoring endpoints
 api_router.include_router(monitoring.router)
@@ -62,6 +64,27 @@ api_router.include_router(graph.router)
 
 # Test Crawler endpoints (new)
 api_router.include_router(test_crawler.router)
+
+# Crawler Documents endpoints (includes URL management)
+api_router.include_router(crawler_documents.router)
+
+# FP Customer Management endpoints
+api_router.include_router(fp_customers.router, prefix="/fp", tags=["FP Customers"])
+
+# Insurer Crawlers endpoints (Samsung Fire, KB Insurance, etc.)
+api_router.include_router(insurer_crawlers.router, prefix="/crawlers", tags=["Insurer Crawlers"])
+
+# Learning Statistics endpoints (Smart Insurance Learner monitoring)
+api_router.include_router(learning_stats.router, prefix="/learning", tags=["Learning Stats"])
+
+# Knowledge Extraction endpoints (Entity extraction from documents)
+api_router.include_router(knowledge.router)
+
+# Knowledge Graph endpoints (Neo4j graph visualization)
+api_router.include_router(knowledge_graph.router, prefix="/knowledge-graph", tags=["Knowledge Graph"])
+
+# Relearning endpoints (Incremental Learning with Upstage)
+api_router.include_router(relearning.router, prefix="/relearning", tags=["Relearning"])
 
 # Crawler endpoints (temporarily disabled)
 # api_router.include_router(crawler.router, prefix="/crawler", tags=["Crawler"])

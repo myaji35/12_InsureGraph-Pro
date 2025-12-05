@@ -38,7 +38,7 @@ class QueryHistory(QueryHistoryBase):
     answer: Optional[str] = None
     confidence: Optional[Decimal] = None
     source_documents: Optional[List[Dict[str, Any]]] = None
-    reasoning_path: Optional[Dict[str, Any]]] = None
+    reasoning_path: Optional[Dict[str, Any]] = None
     execution_time_ms: Optional[int] = None
     created_at: datetime
 

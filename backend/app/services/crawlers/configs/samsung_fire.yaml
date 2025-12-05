@@ -1,0 +1,90 @@
+# Samsung Fire & Marine Insurance Crawler Configuration
+
+insurer:
+  code: samsung_fire
+  name: 삼성화재
+  full_name: 삼성화재해상보험주식회사
+
+urls:
+  base: https://www.samsungfire.com
+  product_list: https://www.samsungfire.com/vh/page/VH.HPIF0103.do
+
+crawl_method: dynamic_js  # Requires Playwright
+
+request:
+  delay: 1.5  # seconds between requests
+  timeout: 30  # seconds
+
+browser:
+  headless: true
+  wait_timeout: 30000  # milliseconds
+
+selectors:
+  tabs:
+    active: "a.ui-tab-btn:has-text('판매상품')"
+    discontinued: "a.ui-tab-btn:has-text('판매중지 상품')"
+
+  product_types: "#depth1 li a"  # Step1: 상품종류
+
+  categories: "#product_gubun > li > a"  # Step2: 상품명
+
+  sub_categories: "#depth3 li a"  # Step3: 하위 카테고리 (optional)
+
+  products: "#product_list li a"  # 구체적 상품명
+
+  sale_periods: "#date_list li a"  # 판매기간
+
+  pdf_buttons: "#pdfDiv2 button:not([disabled])"
+
+product_structure:
+  # 4-level selection system
+  levels:
+    - name: product_type
+      label: 상품종류
+      examples: [자동차보험, 장기보험, 일반보험, 퇴직연금, 퇴직보험]
+
+    - name: category
+      label: 카테고리
+      examples: [개인용, 업무용, 대면, TM/홈쇼핑, 인터넷, 방카슈랑스]
+
+    - name: sub_category
+      label: 하위카테고리
+      examples: [운전자, 자녀, 건강, 상해, 단체, 재물, 저축, 연금]
+      optional: true
+
+    - name: product_name
+      label: 상품명
+
+    - name: sale_period
+      label: 판매기간
+      format: "YYYY.MM.DD ~ YYYY.MM.DD"
+
+pdf_types:
+  - name: 사업방법서
+    button_id_prefix: pdfCnt_0
+    category: business_plan
+
+  - name: 상품요약서
+    button_id_prefix: pdfCnt_1
+    category: product_summary
+
+  - name: 보험약관
+    button_id_prefix: pdfCnt_2
+    category: policy_terms
+
+  - name: 상품설명서
+    button_id_prefix: pdfCnt_3
+    category: product_description
+
+notes:
+  - 삼성화재는 4단계 선택 시스템을 사용합니다
+  - 각 단계는 JavaScript로 동적 로딩됩니다
+  - 일부 카테고리는 하위카테고리를 가지고 있습니다 (예: 대면 > 운전자, 자녀 등)
+  - 하나의 상품이 여러 판매기간을 가질 수 있습니다
+  - PDF 버튼은 판매기간 선택 후 활성화됩니다
+  - 크롤링에 시간이 오래 걸릴 수 있습니다 (상품 수가 많음)
+
+estimated_crawl_time:
+  active_products: 30-60 minutes
+  discontinued_products: 60-120 minutes
+  note: 판매상품만 크롤링하는 것을 권장합니다

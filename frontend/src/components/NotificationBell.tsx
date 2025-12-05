@@ -58,7 +58,20 @@ export default function NotificationBell() {
       const data = await listNotifications(false, undefined, 10) // Get latest 10
       setNotifications(data)
     } catch (err) {
-      console.error('Failed to load notifications:', err)
+      // Silently handle authentication errors (notifications require backend JWT)
+      if (err instanceof Error) {
+        const errorMsg = err.message.toLowerCase()
+        // Only log non-auth errors
+        if (!errorMsg.includes('not authenticated') &&
+            !errorMsg.includes('credentials') &&
+            !errorMsg.includes('unauthorized') &&
+            !errorMsg.includes('failed to fetch') &&
+            !errorMsg.includes('alg value')) {
+          console.error('Failed to load notifications:', err)
+        }
+      }
+      // Set empty notifications to hide the bell badge
+      setNotifications({ items: [], total: 0, unread_count: 0 })
     } finally {
       if (!silent) setLoading(false)
     }

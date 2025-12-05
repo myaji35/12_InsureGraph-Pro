@@ -51,7 +51,7 @@ export default function DocumentsPage() {
         processingDocs.map(async (doc) => {
           try {
             const response = await fetch(
-              `http://localhost:8000/api/v1/documents/${doc.document_id}/processing-status`
+              `http://localhost:3030/api/v1/documents/${doc.document_id}/processing-status`
             )
 
             if (response.ok) {
@@ -100,7 +100,7 @@ export default function DocumentsPage() {
   const handleStartProcessing = async (documentId: string) => {
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/documents/${documentId}/start-processing`,
+        `http://localhost:3030/api/v1/documents/${documentId}/start-processing`,
         {
           method: 'POST',
           headers: {
@@ -120,6 +120,39 @@ export default function DocumentsPage() {
     } catch (error) {
       console.error('Failed to start processing:', error)
       alert('문서 처리 시작에 실패했습니다.')
+    }
+  }
+
+  const handleRelearn = async (documentId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+
+    const confirmRelearn = confirm(
+      '이 문서를 미학습 상태로 초기화하시겠습니까?\n\n' +
+      '경고: 학습된 데이터가 모두 삭제되고 처음부터 다시 학습해야 합니다.'
+    )
+
+    if (!confirmRelearn) return
+
+    try {
+      // 문서 상태를 'pending'으로 변경하는 API 호출
+      const response = await fetch(`http://localhost:8000/api/v1/crawler-documents/${documentId}/reset`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (response.ok) {
+        alert('문서가 미학습 상태로 초기화되었습니다.')
+        // 문서 목록 다시 로드
+        await loadDocuments()
+      } else {
+        const error = await response.json()
+        alert(`초기화 실패: ${error.detail || '알 수 없는 오류'}`)
+      }
+    } catch (error) {
+      console.error('Failed to reset document:', error)
+      alert('문서 초기화에 실패했습니다.')
     }
   }
 
@@ -334,7 +367,7 @@ export default function DocumentsPage() {
                               <div className="flex items-center gap-3 flex-1 min-w-0">
                                 <DocumentTextIcon className="w-6 h-6 text-primary-500 flex-shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center gap-2 flex-wrap">
                                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                                       {doc.product_name}
                                     </p>
@@ -349,6 +382,19 @@ export default function DocumentsPage() {
                                       >
                                         처리 시작
                                       </button>
+                                    )}
+                                    {doc.status === 'ready' && (
+                                      <>
+                                        <span className="text-xs bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-2 py-1 rounded font-medium">
+                                          학습됨
+                                        </span>
+                                        <button
+                                          className="text-xs bg-purple-600 hover:bg-purple-700 text-white px-2 py-1 rounded font-medium"
+                                          onClick={(e) => handleRelearn(doc.document_id, e)}
+                                        >
+                                          재학습
+                                        </button>
+                                      </>
                                     )}
                                   </div>
                                   <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -407,7 +453,7 @@ export default function DocumentsPage() {
                   <div className="flex items-start gap-4 flex-1">
                     <DocumentTextIcon className="w-12 h-12 text-primary-500 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
                           {doc.product_name}
                         </h3>
@@ -422,6 +468,19 @@ export default function DocumentsPage() {
                           >
                             처리 시작
                           </button>
+                        )}
+                        {doc.status === 'ready' && (
+                          <>
+                            <span className="text-sm bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300 px-3 py-1.5 rounded font-medium">
+                              학습됨
+                            </span>
+                            <button
+                              className="text-sm bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded font-medium"
+                              onClick={(e) => handleRelearn(doc.document_id, e)}
+                            >
+                              재학습
+                            </button>
+                          </>
                         )}
                       </div>
                       <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{doc.insurer}</p>

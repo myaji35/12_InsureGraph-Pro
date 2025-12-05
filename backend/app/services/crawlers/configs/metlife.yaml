@@ -1,0 +1,75 @@
+# MetLife Insurance Crawler Configuration
+# 메트라이프생명 크롤러 설정
+
+insurer_code: "metlife"
+insurer_name: "메트라이프생명"
+enabled: true
+
+# URLs
+base_url: "https://brand.metlife.co.kr"
+product_list_urls:
+  active: "/pn/mcvrgProd/retrieveMcvrgProdMain.do"
+  discontinued: "/pn/saleStop/retrieveSaleStopProdMain.do"
+
+# Crawling settings
+crawl_method: "static_html"
+auth_method: "none"
+
+# Selectors
+selectors:
+  product_table: "table.tbl_list"
+  product_row: "tbody > tr"
+  product_name: "td:nth-child(2)"
+  sales_period: "td:nth-child(3)"
+  terms_link: "td:nth-child(6) a.btn_file"
+
+# Download settings
+download:
+  url_template: "/pn/mcvrgProd/mcvrgProdDownloadFile.do"
+  params:
+    - "insProdSeq"  # 상품 일련번호
+    - "seq"         # 버전 번호
+    - "fnum"        # 파일 유형 (03=약관)
+  file_type: "pdf"
+
+# Rate limiting
+rate_limit:
+  request_delay: 0.5  # seconds
+  max_retries: 3
+  timeout: 30
+
+# Pagination
+pagination:
+  enabled: false  # 아코디언 형식이지만 자동 확장 필요 없음
+
+# Product categorization
+categories:
+  main_insurance:
+    - "종신보험"
+    - "정기보험"
+    - "연금보험"
+    - "저축보험"
+    - "CI보험"
+    - "간병보험"
+    - "암보험"
+    - "건강보험"
+    - "변액보험"
+    - "어린이보험"
+    - "실손보험"
+
+# Custom headers
+headers:
+  User-Agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  Referer: "https://brand.metlife.co.kr/pn/paReal/insuProductDisclMain.do"
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+  Accept-Language: "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7"
+
+# Metadata
+metadata:
+  last_updated: "2025-12-05"
+  version: "1.0.0"
+  notes: |
+    - 판매상품목록과 판매중지상품 모두 크롤링
+    - 약관 파일은 동일한 다운로드 엔드포인트 사용 (fnum=03)
+    - 상품명에서 자동으로 상품 유형 분류
+    - PDF 직접 다운로드 방식 (상세 페이지 없음)

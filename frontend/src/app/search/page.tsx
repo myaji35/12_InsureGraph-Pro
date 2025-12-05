@@ -58,7 +58,7 @@ export default function SearchPage() {
 
   const loadInsurers = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/v1/search/insurers')
+      const response = await fetch('http://localhost:3030/api/v1/search/insurers')
       const data = await response.json()
       setInsurers(data.insurers)
     } catch (err) {
@@ -81,7 +81,7 @@ export default function SearchPage() {
       params.append('page_size', pageSize.toString())
 
       const response = await fetch(
-        `http://localhost:8000/api/v1/search/documents?${params.toString()}`
+        `http://localhost:3030/api/v1/search/documents?${params.toString()}`
       )
 
       if (!response.ok) {

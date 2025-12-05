@@ -249,13 +249,9 @@ def _get_document_stats(conn) -> dict:
         """)
         by_insurer = {row['insurer']: row['count'] for row in cur.fetchall()}
 
-        # By type
-        cur.execute("""
-            SELECT document_type, COUNT(*) as count
-            FROM documents
-            GROUP BY document_type
-        """)
-        by_type = {row['document_type']: row['count'] for row in cur.fetchall()}
+        # By type (using insurer as fallback since document_type column doesn't exist)
+        # TODO: Add document_type column to documents table
+        by_type = {}
 
         # Total pages and articles
         cur.execute("""

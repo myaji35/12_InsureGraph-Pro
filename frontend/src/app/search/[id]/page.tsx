@@ -79,7 +79,7 @@ export default function DocumentDetailPage() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/api/v1/search/documents/${documentId}`
+        `http://localhost:3030/api/v1/search/documents/${documentId}`
       )
 
       if (!response.ok) {

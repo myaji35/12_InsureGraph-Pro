@@ -13,9 +13,9 @@ import type {
 import { showError } from './toast-config'
 import { getErrorMessage, getErrorMessageFromStatus } from './error-messages'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3030/api'
 const API_VERSION = process.env.NEXT_PUBLIC_API_VERSION || 'v1'
-const BASE_URL = `${API_URL}/api/${API_VERSION}`
+const BASE_URL = `${API_BASE_URL}/${API_VERSION}`
 
 class APIClient {
   private client: AxiosInstance
@@ -513,6 +513,54 @@ class APIClient {
         headless
       }
     })
+    return response.data
+  }
+
+  /**
+   * Get crawler URLs
+   */
+  async getCrawlerUrls(params: {
+    insurer?: string
+  } = {}): Promise<Array<{
+    id: string
+    insurer: string
+    url: string
+    description: string
+    enabled: boolean
+    created_at: string | null
+  }>> {
+    const response = await this.client.get('/crawler/urls', { params })
+    return response.data.items || []
+  }
+
+  /**
+   * Get crawler documents
+   */
+  async getCrawlerDocuments(params: {
+    insurer?: string
+    category?: string
+    status?: string
+    limit?: number
+    offset?: number
+  } = {}): Promise<{
+    total: number
+    items: Array<{
+      id: string
+      insurer: string
+      title: string
+      pdf_url: string
+      category: string
+      product_type: string | null
+      source_url: string | null
+      status: string
+      processing_step?: string | null
+      processing_progress?: number | null
+      processing_detail?: any | null
+      created_at: string
+      updated_at: string
+    }>
+  }> {
+    const response = await this.client.get('/crawler/documents', { params })
     return response.data
   }
 }

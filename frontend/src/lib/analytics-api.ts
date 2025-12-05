@@ -6,7 +6,7 @@
 
 import { DashboardOverview } from '@/types/analytics'
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3030/api'
 
 async function getAuthHeaders(): Promise<HeadersInit> {
   const token = localStorage.getItem('access_token')

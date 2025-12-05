@@ -11,7 +11,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { useUser, useClerk } from '@clerk/nextjs'
 import { ThemeToggle } from './ThemeToggle'
-import NotificationBell from './NotificationBell'
+// import NotificationBell from './NotificationBell' // Temporarily disabled
 
 interface HeaderProps {
   onMenuClick: () => void
@@ -51,7 +51,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           <ThemeToggle />
 
           {/* Notifications - Task D */}
-          <NotificationBell />
+          {/* <NotificationBell /> */}
 
           {/* User menu */}
           <Menu as="div" className="relative">

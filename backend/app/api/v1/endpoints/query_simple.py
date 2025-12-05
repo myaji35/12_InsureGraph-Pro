@@ -8,11 +8,11 @@ from typing import Optional, List, Dict, Any
 from uuid import UUID
 from datetime import datetime
 from fastapi import APIRouter, HTTPException, Query as QueryParam, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
 from pydantic import BaseModel, Field
+from psycopg2.extras import Json
+import json
 
-from app.core.database import get_db
+from app.core.database import get_pg_connection
 from app.core.security import get_current_active_user
 from app.models.user import User
 from app.services.query_parser import get_query_parser, QueryIntent
@@ -114,7 +114,7 @@ class HealthResponse(BaseModel):
 async def execute_simple_query(
     request: SimpleQueryRequest,
     user: User = Depends(get_current_active_user),
-    db: AsyncSession = Depends(get_db),
+    db = Depends(get_pg_connection),
 ):
     """
     자연어 질문에 대한 답변을 생성합니다.
@@ -278,37 +278,36 @@ async def execute_simple_query(
             } if graph_paths else None
 
             # Insert into query_history
-            save_query = text("""
+            cursor = db.cursor()
+            cursor.execute(
+                """
                 INSERT INTO query_history (
                     user_id, customer_id, query_text, intent, answer,
                     confidence, source_documents, reasoning_path, execution_time_ms
                 )
                 VALUES (
-                    :user_id, :customer_id, :query_text, :intent, :answer,
-                    :confidence, :source_documents, :reasoning_path, :execution_time_ms
+                    %s, %s, %s, %s, %s, %s, %s, %s, %s
                 )
-            """)
-
-            await db.execute(
-                save_query,
-                {
-                    "user_id": str(user.user_id),
-                    "customer_id": request.customer_id if request.customer_id else None,
-                    "query_text": request.query,
-                    "intent": parsed_query.intent.value,
-                    "answer": reasoning_result.answer[:1000],  # Limit answer length
-                    "confidence": float(validation_result.confidence),
-                    "source_documents": source_docs,
-                    "reasoning_path": reasoning_path_data,
-                    "execution_time_ms": execution_time_ms,
-                },
+                """,
+                (
+                    str(user.user_id),
+                    request.customer_id if request.customer_id else None,
+                    request.query,
+                    parsed_query.intent.value,
+                    reasoning_result.answer[:1000],  # Limit answer length
+                    float(validation_result.confidence),
+                    Json(source_docs),
+                    Json(reasoning_path_data) if reasoning_path_data else None,
+                    execution_time_ms,
+                ),
             )
-            await db.commit()
+            db.commit()
+            cursor.close()
             logger.info(f"Saved query history for user {user.user_id}")
         except Exception as save_error:
             logger.warning(f"Failed to save query history: {save_error}")
             # Don't fail the request if history save fails
-            await db.rollback()
+            db.rollback()
 
         return response
 

@@ -1,0 +1,23 @@
+{
+  "name": "insuregraph-pro",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GraphRAG 기반 보험 질의응답 시스템",
+  "scripts": {
+    "dev": "turbo run dev",
+    "dev:web": "turbo run dev --filter=web",
+    "dev:api": "cd backend && uvicorn app.main:app --host 0.0.0.0 --port 3030 --reload",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.6.1"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

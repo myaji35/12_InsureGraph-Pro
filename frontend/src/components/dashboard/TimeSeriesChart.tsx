@@ -56,6 +56,7 @@ export default function TimeSeriesChart() {
     <div className="space-y-4">
       {/* 누적 차트 */}
       <div className="h-[300px]">
+        <h3 className="text-sm font-medium mb-2">전체 문서 현황 (누적)</h3>
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={timeseriesData}>
             <defs>
@@ -125,7 +126,7 @@ export default function TimeSeriesChart() {
 
       {/* 추세선 차트 */}
       <div className="h-[200px]">
-        <h3 className="text-sm font-medium mb-2">학습 문서 추이</h3>
+        <h3 className="text-sm font-medium mb-2">학습 진행 추세</h3>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={timeseriesData}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />

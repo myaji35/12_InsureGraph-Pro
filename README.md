@@ -71,6 +71,8 @@ InsureGraph Pro는 GraphRAG(Graph Retrieval-Augmented Generation) 기술을 활�
 
 ## 📂 프로젝트 구조
 
+이 프로젝트는 **모노레포(Monorepo)** 구조로 구성되어 있으며, Turborepo와 pnpm workspaces를 사용합니다.
+
 ```
 InsureGraph Pro/
 ├── backend/                    # FastAPI 백엔드
@@ -80,7 +82,7 @@ InsureGraph Pro/
 │   │   │       ├── auth.py
 │   │   │       ├── ingestion.py
 │   │   │       ├── query.py
-│   │   │       └── compliance.py
+│   │   │       └── crawler_urls.py
 │   │   ├── core/              # 핵심 설정
 │   │   │   ├── config.py
 │   │   │   ├── security.py
@@ -91,9 +93,8 @@ InsureGraph Pro/
 │   │   │   └── compliance/
 │   │   ├── models/            # 데이터 모델
 │   │   └── main.py            # FastAPI 앱 엔트리포인트
-│   ├── migrations/            # 데이터베이스 마이그레이션
-│   │   ├── postgresql/
-│   │   └── neo4j/
+│   ├── alembic/               # 데이터베이스 마이그레이션
+│   │   └── versions/
 │   ├── tests/                 # 테스트
 │   ├── Dockerfile
 │   ├── requirements.txt
@@ -107,33 +108,36 @@ InsureGraph Pro/
 │   ├── public/
 │   ├── package.json
 │   └── Dockerfile
-├── infrastructure/             # 인프라 코드
-│   ├── terraform/
-│   │   ├── gcp/
-│   │   ├── kubernetes/
-│   │   └── modules/
-│   └── kubernetes/
-│       ├── deployments/
-│       ├── services/
-│       └── ingress/
+├── packages/                   # 공유 패키지 (Monorepo)
+│   └── shared-types/          # 프론트엔드-백엔드 공유 TypeScript 타입
+│       ├── src/
+│       │   └── index.ts       # 공통 타입 정의
+│       ├── package.json
+│       └── tsconfig.json
 ├── docs/                       # 문서
 │   ├── architecture.md
 │   ├── api-specifications.md
 │   ├── gcp-infrastructure-setup.md
 │   ├── sprint-planning.md
 │   └── epics/
-│       ├── epic-01-data-ingestion.md
-│       ├── epic-02-graphrag-query-engine.md
-│       ├── epic-03-fp-workspace.md
-│       └── epic-04-compliance-security.md
 ├── scripts/                    # 유틸리티 스크립트
 │   ├── run_pg_migrations.py
 │   ├── run_neo4j_migrations.py
 │   └── seed_test_data.py
+├── pnpm-workspace.yaml         # pnpm workspace 설정
+├── turbo.json                  # Turborepo 파이프라인 설정
+├── package.json                # 루트 패키지 설정
 ├── prd.md
 ├── graphrag-implementation-strategy.md
 └── README.md                   # 이 파일
 ```
+
+### 모노레포의 이점
+
+1. **코드 공유**: `packages/shared-types`를 통해 프론트엔드와 백엔드가 동일한 타입 정의 사용
+2. **원자적 커밋**: API 변경 시 프론트엔드와 백엔드를 동시에 업데이트
+3. **일관된 개발 환경**: 모든 패키지가 동일한 도구 및 설정 사용
+4. **효율적인 빌드**: Turborepo의 캐싱으로 변경된 패키지만 재빌드
 
 ---
 
@@ -155,7 +159,19 @@ git clone https://github.com/YOUR_ORG/insuregraph-pro.git
 cd insuregraph-pro
 ```
 
-### 2. 백엔드 설정
+### 2. 모노레포 의존성 설치
+
+```bash
+# pnpm을 사용하여 워크스페이스 의존성 설치
+pnpm install
+
+# 공유 타입 패키지 빌드
+cd packages/shared-types
+pnpm build
+cd ../..
+```
+
+### 3. 백엔드 설정
 
 ```bash
 cd backend
@@ -171,35 +187,42 @@ pip install -r requirements.txt
 cp .env.example .env
 # .env 파일 편집 (데이터베이스 연결 정보 등)
 
-# 데이터베이스 마이그레이션
-python scripts/run_pg_migrations.py
-python scripts/run_neo4j_migrations.py
+# 데이터베이스 마이그레이션 실행
+bash scripts/apply_migration.sh 004_add_crawler_urls_table
 
-# 개발 서버 실행
-uvicorn app.main:app --reload --port 8000
+# 개발 서버 실행 (포트 3030)
+uvicorn app.main:app --host 0.0.0.0 --port 3030 --reload
 ```
 
-**API 확인**: http://localhost:8000/docs (Swagger UI)
+**API 확인**: http://localhost:3030/docs (Swagger UI)
 
-### 3. 프론트엔드 설정
+### 4. 프론트엔드 설정
 
 ```bash
 cd frontend
-
-# 의존성 설치
-npm install
 
 # 환경 변수 설정
 cp .env.example .env.local
 # .env.local 파일 편집
 
 # 개발 서버 실행
-npm run dev
+pnpm dev
 ```
 
 **앱 확인**: http://localhost:3000
 
-### 4. Docker Compose로 전체 실행 (추천)
+### 5. Turborepo로 전체 실행 (권장)
+
+```bash
+# 루트 디렉토리에서 모든 서비스 동시 실행
+pnpm dev
+
+# 또는 개별 실행
+pnpm dev:web    # 프론트엔드만
+pnpm dev:api    # 백엔드만
+```
+
+### 6. Docker Compose로 전체 실행
 
 ```bash
 # 루트 디렉토리에서

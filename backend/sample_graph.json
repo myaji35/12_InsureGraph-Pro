@@ -1,0 +1,1704 @@
+{
+  "nodes": [
+    {
+      "id": "insurer_0",
+      "label": "삼성화재",
+      "type": "insurer",
+      "color": "#3b82f6",
+      "size": 40
+    },
+    {
+      "id": "insurer_1",
+      "label": "메트라이프생명",
+      "type": "insurer",
+      "color": "#3b82f6",
+      "size": 40
+    },
+    {
+      "id": "type_0",
+      "label": "자동차보험",
+      "type": "product_type",
+      "color": "#8b5cf6",
+      "size": 25,
+      "insurer": "삼성화재"
+    },
+    {
+      "id": "type_1",
+      "label": "기타",
+      "type": "product_type",
+      "color": "#8b5cf6",
+      "size": 25,
+      "insurer": "메트라이프생명"
+    },
+    {
+      "id": "type_2",
+      "label": "연금보험",
+      "type": "product_type",
+      "color": "#8b5cf6",
+      "size": 25,
+      "insurer": "메트라이프생명"
+    },
+    {
+      "id": "type_3",
+      "label": "종신보험",
+      "type": "product_type",
+      "color": "#8b5cf6",
+      "size": 25,
+      "insurer": "메트라이프생명"
+    },
+    {
+      "id": "type_4",
+      "label": "정기보험",
+      "type": "product_type",
+      "color": "#8b5cf6",
+      "size": 25,
+      "insurer": "메트라이프생명"
+    },
+    {
+      "id": "doc_405c0760-57e3-4ae1-9e19-1a9ecc1b59a3",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.12.21 ~ 2024.01.10)",
+        "updated_at": "2025-12-03T05:24:30.910955+00:00"
+      }
+    },
+    {
+      "id": "doc_0dfa7ac9-0956-4409-9d12-8582b8b167a1",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2022.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2022.07.28 ~ 2022.08.31)",
+        "updated_at": "2025-12-03T04:52:59.057307+00:00"
+      }
+    },
+    {
+      "id": "doc_29d49bac-05a1-46f6-9438-64d9917e5dec",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2022.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2022.09.01 ~ 2022.10.31)",
+        "updated_at": "2025-12-03T04:35:06.870761+00:00"
+      }
+    },
+    {
+      "id": "doc_166c4a54-0831-4271-a990-5eca90c7fa3b",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2022.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2022.11.01 ~ 2022.12.31)",
+        "updated_at": "2025-12-03T04:31:02.640482+00:00"
+      }
+    },
+    {
+      "id": "doc_ffe98e4f-b5be-42b1-aae5-e651242a791b",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.02.01 ~ 2023.02.22)",
+        "updated_at": "2025-12-03T04:26:38.511962+00:00"
+      }
+    },
+    {
+      "id": "doc_e81c3eb9-610e-413d-a48d-568ca63e99d0",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.03.01 ~ 2023.04.25)",
+        "updated_at": "2025-12-03T04:21:25.427716+00:00"
+      }
+    },
+    {
+      "id": "doc_cd024ff7-f3ed-4790-83af-c7d646326f89",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.01.01 ~ 2023.01.31)",
+        "updated_at": "2025-12-03T04:17:14.422824+00:00"
+      }
+    },
+    {
+      "id": "doc_55089dff-ec1b-4d45-b70f-bcce8e4a438b",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.02.23 ~ 2023.02.28)",
+        "updated_at": "2025-12-03T04:17:12.417501+00:00"
+      }
+    },
+    {
+      "id": "doc_2a92d88d-3279-4039-9d31-6796af9501f4",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.06.01 ~ 2023.06.30)",
+        "updated_at": "2025-12-03T04:17:10.406443+00:00"
+      }
+    },
+    {
+      "id": "doc_de721865-82c1-4b71-b2e2-2af18c36c1da",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.04.26 ~ 2023.04.30)",
+        "updated_at": "2025-12-03T04:04:34.582737+00:00"
+      }
+    },
+    {
+      "id": "doc_48c446dd-9099-4a0f-b321-417dcebb4880",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.07.01 ~ 2023.09.15)",
+        "updated_at": "2025-12-03T04:04:32.571372+00:00"
+      }
+    },
+    {
+      "id": "doc_c8b803a6-1af7-4d20-981f-6ba6286c49de",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.11.11 ~ 2023.12.10)",
+        "updated_at": "2025-12-03T04:03:32.585001+00:00"
+      }
+    },
+    {
+      "id": "doc_09f0e566-0bcc-4fda-9da5-091034a706ff",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.12.11 ~ 2023.12.20)",
+        "updated_at": "2025-12-03T04:02:11.960774+00:00"
+      }
+    },
+    {
+      "id": "doc_aa19cfab-f89d-4409-9dc0-a17731d7662b",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.09.16 ~ 2023.10.10)",
+        "updated_at": "2025-12-02T12:05:58.512105+00:00"
+      }
+    },
+    {
+      "id": "doc_b2faef49-1dc3-4c86-8ff6-0c29a93b8a15",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.10.11 ~ 2023.11.10)",
+        "updated_at": "2025-12-02T12:05:56.521192+00:00"
+      }
+    },
+    {
+      "id": "doc_159ff425-7b3e-4837-ac8e-883a7b4ec2c7",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2023.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2023.05.01 ~ 2023.05.31)",
+        "updated_at": "2025-12-02T12:05:56.521020+00:00"
+      }
+    },
+    {
+      "id": "doc_fc904499-18aa-484c-8d9a-b7ea7ab3e492",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.01.11 ~ 2024.01.18)",
+        "updated_at": "2025-12-02T12:05:54.498340+00:00"
+      }
+    },
+    {
+      "id": "doc_296be5eb-1ca3-48df-be5a-3709d60944e4",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.01.19 ~ 2024.02.15)",
+        "updated_at": "2025-12-02T12:05:53.959266+00:00"
+      }
+    },
+    {
+      "id": "doc_b77c4c0d-b517-4677-b1e5-8e511cf3db90",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.03.05 ~ 2024.03.06)",
+        "updated_at": "2025-12-02T12:05:19.388036+00:00"
+      }
+    },
+    {
+      "id": "doc_97ae911a-f086-4479-ac31-5cb93614d9a2",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.02.16 ~ 2024.03.04)",
+        "updated_at": "2025-12-02T11:53:33.592135+00:00"
+      }
+    },
+    {
+      "id": "doc_c3a19173-ecbf-49db-a4d5-68a98b5d25ec",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.03.07 ~ 2024.04.10)",
+        "updated_at": "2025-12-02T11:53:31.585352+00:00"
+      }
+    },
+    {
+      "id": "doc_4b345eba-ac31-4e66-a75a-b1ce76a8b237",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.04.11 ~ 2024.04.25)",
+        "updated_at": "2025-12-02T11:53:29.582012+00:00"
+      }
+    },
+    {
+      "id": "doc_64aea3ef-d7c7-4277-a203-f00ff37591ba",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.07.06 ~ 2025.08.15)",
+        "updated_at": "2025-12-02T11:49:48.418125+00:00"
+      }
+    },
+    {
+      "id": "doc_0a819d32-056f-455e-986e-b6d9d57f63ff",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.04.26 ~ 2024.05.09)",
+        "updated_at": "2025-12-02T11:49:46.523470+00:00"
+      }
+    },
+    {
+      "id": "doc_f5c66e50-605d-42d1-b9ba-bf8d69b37300",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.09.11 ~ 2024.10.05)",
+        "updated_at": "2025-12-02T11:49:46.522526+00:00"
+      }
+    },
+    {
+      "id": "doc_3582a4e5-5367-4690-8e49-68e240916f2e",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.10.06 ~ 2024.11.10)",
+        "updated_at": "2025-12-02T11:49:46.519132+00:00"
+      }
+    },
+    {
+      "id": "doc_359acae9-6fa0-40f4-9d53-6529721f10a8",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.05.10 ~ 2024.05.20)",
+        "updated_at": "2025-12-02T11:49:46.518811+00:00"
+      }
+    },
+    {
+      "id": "doc_22c4c3e3-2d3e-4a5d-92dd-34be24662806",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.07.01 ~ 2024.07.31)",
+        "updated_at": "2025-12-02T11:49:46.517668+00:00"
+      }
+    },
+    {
+      "id": "doc_a49df24b-cc07-4afa-a441-7ecc81fbed2f",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.05.21 ~ 2024.06.10)",
+        "updated_at": "2025-12-02T11:49:46.517610+00:00"
+      }
+    },
+    {
+      "id": "doc_52e7fdc3-5568-4e38-a8cd-054f78456416",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.06.11 ~ 2024.06.30)",
+        "updated_at": "2025-12-02T11:49:46.511117+00:00"
+      }
+    },
+    {
+      "id": "doc_35834788-fcc4-4693-8c77-48dc8614ae25",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.08.01 ~ 2024.09.10)",
+        "updated_at": "2025-12-02T11:49:44.422752+00:00"
+      }
+    },
+    {
+      "id": "doc_8a551c6b-e6bd-4c3e-87d1-c76751813b03",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.01.01 ~ 2025.01.15)",
+        "updated_at": "2025-12-02T11:49:43.898842+00:00"
+      }
+    },
+    {
+      "id": "doc_6770d69b-6434-4d09-9a5a-4145d98a0bfc",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.11.11 ~ 2024.12.20)",
+        "updated_at": "2025-12-02T11:24:18.074337+00:00"
+      }
+    },
+    {
+      "id": "doc_00d9c467-fe0b-4b2f-9abf-9fdcfd4d35cb",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.02.06 ~ 2025.04.05)",
+        "updated_at": "2025-12-02T11:24:14.063086+00:00"
+      }
+    },
+    {
+      "id": "doc_3e669c02-4306-4671-9fba-9055ee88c7dc",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.04.06 ~ 2025.05.05)",
+        "updated_at": "2025-12-02T11:22:48.094858+00:00"
+      }
+    },
+    {
+      "id": "doc_5a4c3719-5df7-4337-90a4-91ed5342330f",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.01.16 ~ 2025.02.05)",
+        "updated_at": "2025-12-02T11:22:46.047214+00:00"
+      }
+    },
+    {
+      "id": "doc_2dd267fb-b4e6-42af-adfe-661dbe8c49b3",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2024.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2024.12.21 ~ 2024.12.31)",
+        "updated_at": "2025-12-02T11:22:46.046401+00:00"
+      }
+    },
+    {
+      "id": "doc_54510cfe-f68c-4734-9053-0f630359a971",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.05.21 ~ 2025.07.05)",
+        "updated_at": "2025-12-02T11:22:42.036204+00:00"
+      }
+    },
+    {
+      "id": "doc_05e390e0-d5db-44db-bd5b-85f6b21d2258",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.10.11 ~ 2025.11.15)",
+        "updated_at": "2025-12-02T11:22:41.013693+00:00"
+      }
+    },
+    {
+      "id": "doc_ce78599d-40b6-484e-96f6-e72e758aaaed",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.05.06 ~ 2025.05.20)",
+        "updated_at": "2025-12-02T11:20:35.376186+00:00"
+      }
+    },
+    {
+      "id": "doc_4a8ebf54-1602-4d84-8f94-77c853a6fe7a",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.09.01 ~ 2025.10.10)",
+        "updated_at": "2025-12-02T11:20:33.313751+00:00"
+      }
+    },
+    {
+      "id": "doc_d421bcf7-495e-4c05-a4e4-b57e94fd02bf",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.08.16 ~ 2025.08.31)",
+        "updated_at": "2025-12-02T11:20:33.309590+00:00"
+      }
+    },
+    {
+      "id": "doc_88be39db-ce52-4344-8255-a2bab77edaed",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.11.16 ~ 현재)",
+        "updated_at": "2025-12-02T11:18:03.988876+00:00"
+      }
+    },
+    {
+      "id": "doc_55f775a7-d8a7-408a-8c0e-67b8e1c2293b",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.04.06 ~ 2025.05.05)",
+        "updated_at": "2025-12-02T11:14:37.842180+00:00"
+      }
+    },
+    {
+      "id": "doc_f313fc62-ec35-449e-974d-c55d2e46b1b3",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.01.16 ~ 2025.02.05)",
+        "updated_at": "2025-12-02T11:14:36.835704+00:00"
+      }
+    },
+    {
+      "id": "doc_98a57324-c78a-48f2-99f3-8e765b060ebf",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.05.06 ~ 2025.05.20)",
+        "updated_at": "2025-12-02T11:13:51.800557+00:00"
+      }
+    },
+    {
+      "id": "doc_d4e83ff6-916d-42e3-b082-ab0cd2e0ae8e",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.05.21 ~ 2025.07.05)",
+        "updated_at": "2025-12-02T11:13:09.970752+00:00"
+      }
+    },
+    {
+      "id": "doc_05ba689e-6d70-43cd-938b-40e7a5aa074c",
+      "label": "자동차보험\n개인용애니카자동차보험 - 보험약관 (2025.08.16",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카자동차보험 - 보험약관 (2025.08.16 ~ 2025.08.31)",
+        "updated_at": "2025-12-02T11:12:26.980451+00:00"
+      }
+    },
+    {
+      "id": "doc_69343f9d-8235-433a-98b4-495f2c1434e4",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.08.16 ~ 2025.08.31)",
+        "updated_at": "2025-12-02T11:12:26.037790+00:00"
+      }
+    },
+    {
+      "id": "doc_acc55748-1683-4399-afbc-f0bc654499ac",
+      "label": "기타\n약관_무배당 키즈드림 변액유니버셜보험_202008.pd",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "기타",
+        "title": "약관_무배당 키즈드림 변액유니버셜보험_202008.pdf",
+        "updated_at": "2025-12-02T11:12:26.037511+00:00"
+      }
+    },
+    {
+      "id": "doc_19cf7d5f-b16c-408e-b6c5-e1d2131ee5af",
+      "label": "연금보험\n02_약관_무배당변액연금보험_동행(고도재해장해보장형-월",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "연금보험",
+        "title": "02_약관_무배당변액연금보험_동행(고도재해장해보장형-월납)_202304.pdf",
+        "updated_at": "2025-12-02T11:12:17.988714+00:00"
+      }
+    },
+    {
+      "id": "doc_4ee5193e-f404-4c3c-a191-dbcb91bbdf83",
+      "label": "연금보험\n02_약관_무배당변액연금보험_동행(고도재해장해보장형-일",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "연금보험",
+        "title": "02_약관_무배당변액연금보험_동행(고도재해장해보장형-일시납)_202304.pdf",
+        "updated_at": "2025-12-02T11:12:17.073749+00:00"
+      }
+    },
+    {
+      "id": "doc_a9b6f506-714e-4496-8e62-d8b197e51eeb",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.07.06 ~ 2025.08.15)",
+        "updated_at": "2025-12-02T10:32:37.443282+00:00"
+      }
+    },
+    {
+      "id": "doc_f741fb1d-4474-483e-9491-1642320ac15a",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.0",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.09.01 ~ 2025.10.10)",
+        "updated_at": "2025-12-02T10:32:35.434120+00:00"
+      }
+    },
+    {
+      "id": "doc_15738e20-f324-4546-a18c-248cc0a4c0ac",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.10.11 ~ 2025.11.15)",
+        "updated_at": "2025-12-02T10:32:00.566578+00:00"
+      }
+    },
+    {
+      "id": "doc_cac6b94d-dfda-49b0-a13c-79dc440ef1f0",
+      "label": "자동차보험\n개인용애니카다이렉트자동차보험 - 보험약관 (2025.1",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "title": "개인용애니카다이렉트자동차보험 - 보험약관 (2025.11.16 ~ 현재)",
+        "updated_at": "2025-12-02T10:30:15.440539+00:00"
+      }
+    },
+    {
+      "id": "doc_7b314313-5203-4027-a5ba-debdebf0a567",
+      "label": "종신보험\n약관_무배당미리받는GI종신보험(저해지환급금형)_2021",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "종신보험",
+        "title": "약관_무배당미리받는GI종신보험(저해지환급금형)_202106.pdf",
+        "updated_at": "2025-12-02T06:08:28.432999+00:00"
+      }
+    },
+    {
+      "id": "doc_2da35610-0a1e-407c-81be-03d145272d44",
+      "label": "연금보험\n02_약관_무배당변액연금보험_동행(사망보장형-월납)_2",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "연금보험",
+        "title": "02_약관_무배당변액연금보험_동행(사망보장형-월납)_202304.pdf",
+        "updated_at": "2025-12-02T06:08:25.127147+00:00"
+      }
+    },
+    {
+      "id": "doc_7e39d5e1-b652-4d2a-aacb-a437a10dba72",
+      "label": "종신보험\n무배당 미리받는 GI 종신보험(저해지 환급금형)-최종(",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "종신보험",
+        "title": "무배당 미리받는 GI 종신보험(저해지 환급금형)-최종(7월 약관 업데이트).pdf",
+        "updated_at": "2025-12-02T06:08:21.420843+00:00"
+      }
+    },
+    {
+      "id": "doc_f2762b78-b69a-4a4c-b3d4-15ccb8f658ca",
+      "label": "연금보험\n약관_무배당 전환변액연금보험_20210701.pdf",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "연금보험",
+        "title": "약관_무배당 전환변액연금보험_20210701.pdf",
+        "updated_at": "2025-12-02T05:44:13.091764+00:00"
+      }
+    },
+    {
+      "id": "doc_e1c604f3-226d-4ec1-8411-8cbd059138cd",
+      "label": "연금보험\n약관_변액연금보험_동행(고도재해장해보장형-월납)_202",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "연금보험",
+        "title": "약관_변액연금보험_동행(고도재해장해보장형-월납)_20210701.pdf",
+        "updated_at": "2025-12-02T05:36:35.522040+00:00"
+      }
+    },
+    {
+      "id": "doc_e6ad0330-7fb6-4fb5-b4fb-50df6ecb76f1",
+      "label": "연금보험\n약관_변액연금보험_동행(고도재해장해보장형-일시납)_20",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "연금보험",
+        "title": "약관_변액연금보험_동행(고도재해장해보장형-일시납)_20210701.pdf",
+        "updated_at": "2025-12-02T05:35:15.286450+00:00"
+      }
+    },
+    {
+      "id": "doc_770363fd-c5a9-4593-9cf1-ae32052a1ca7",
+      "label": "연금보험\n약관_변액연금보험_동행(사망보장형-월납)_2021070",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "연금보험",
+        "title": "약관_변액연금보험_동행(사망보장형-월납)_20210701.pdf",
+        "updated_at": "2025-12-02T05:35:08.264765+00:00"
+      }
+    },
+    {
+      "id": "doc_cc6b2d3f-a20d-400e-9932-883b070a3abc",
+      "label": "종신보험\n약관_무배당 변액유니버셜오늘의(VIP)종신보험 Plus",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "종신보험",
+        "title": "약관_무배당 변액유니버셜오늘의(VIP)종신보험 Plus_20210701.pdf",
+        "updated_at": "2025-12-02T05:34:45.982153+00:00"
+      }
+    },
+    {
+      "id": "doc_ee1bb48e-3425-438c-afa3-79ac48451525",
+      "label": "기타\n약관_무배당 키즈드림 변액유니버셜보험_20210701.",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "기타",
+        "title": "약관_무배당 키즈드림 변액유니버셜보험_20210701.pdf",
+        "updated_at": "2025-12-02T05:32:42.442444+00:00"
+      }
+    },
+    {
+      "id": "doc_87f04d7f-285e-4a1d-8a33-62eb10efad11",
+      "label": "기타\n03_약관_무배당키즈드림변액유니버셜보험_20190701",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "기타",
+        "title": "03_약관_무배당키즈드림변액유니버셜보험_20190701_v10.pdf",
+        "updated_at": "2025-12-02T05:24:25.348849+00:00"
+      }
+    },
+    {
+      "id": "doc_dccf4b4c-2ceb-485a-b6d0-25c27d151b6a",
+      "label": "종신보험\n약관_무배당미리받는GI종신보험(저해약환급금형)_2023",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "종신보험",
+        "title": "약관_무배당미리받는GI종신보험(저해약환급금형)_20230701_v1.pdf",
+        "updated_at": "2025-12-02T05:24:18.327634+00:00"
+      }
+    },
+    {
+      "id": "doc_986b5bf6-b32d-4ab1-bac5-ec7fb0aa6159",
+      "label": "기타\n약관_아이사랑 첫보험_20170101.pdf",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "기타",
+        "title": "약관_아이사랑 첫보험_20170101.pdf",
+        "updated_at": "2025-12-02T05:23:27.810749+00:00"
+      }
+    },
+    {
+      "id": "doc_0e4765d9-249c-468c-9212-61d6f1b85efa",
+      "label": "기타\n무배당 아이사랑 첫보험 약관.pdf",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "기타",
+        "title": "무배당 아이사랑 첫보험 약관.pdf",
+        "updated_at": "2025-12-02T05:19:26.489038+00:00"
+      }
+    },
+    {
+      "id": "doc_3c897939-931d-4070-891f-dcee31ab0d2b",
+      "label": "정기보험\n무배당 더해주고 채워주는 정기보험 약관.pdf",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "정기보험",
+        "title": "무배당 더해주고 채워주는 정기보험 약관.pdf",
+        "updated_at": "2025-12-02T05:18:09.841270+00:00"
+      }
+    },
+    {
+      "id": "doc_30607a58-2330-446a-bd23-7ed9ba7fd55f",
+      "label": "정기보험\n약관_더해주고채워주는정기보험_20170101.pdf",
+      "type": "document",
+      "color": "#10b981",
+      "size": 15,
+      "metadata": {
+        "insurer": "메트라이프생명",
+        "product_type": "정기보험",
+        "title": "약관_더해주고채워주는정기보험_20170101.pdf",
+        "updated_at": "2025-12-02T05:18:09.841270+00:00"
+      }
+    },
+    {
+      "id": "entity_death_benefit_1",
+      "label": "사망보험금",
+      "type": "coverage_item",
+      "color": "#ef4444",
+      "size": 20,
+      "metadata": {
+        "description": "교통사고로 인한 사망 시 지급되는 보험금",
+        "source_text": "피보험자가 보험기간 중 교통사고로 사망한 경우",
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "document_id": "38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f"
+      }
+    },
+    {
+      "id": "entity_amount_100m",
+      "label": "1억원",
+      "type": "benefit_amount",
+      "color": "#f59e0b",
+      "size": 20,
+      "metadata": {
+        "description": "사망보험금 지급액",
+        "source_text": "보험가입금액의 100%인 1억원을 지급합니다",
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "document_id": "38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f"
+      }
+    },
+    {
+      "id": "entity_condition_traffic",
+      "label": "교통사고로 사망",
+      "type": "payment_condition",
+      "color": "#eab308",
+      "size": 20,
+      "metadata": {
+        "description": "교통사고가 원인인 사망 사고",
+        "source_text": "교통사고로 사망한 경우",
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "document_id": "38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f"
+      }
+    },
+    {
+      "id": "entity_disability",
+      "label": "후유장해보험금",
+      "type": "coverage_item",
+      "color": "#ef4444",
+      "size": 20,
+      "metadata": {
+        "description": "장해지급률 3% 이상의 후유장해 보상",
+        "source_text": "장해지급률 3% 이상의 후유장해를 입은 경우",
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "document_id": "38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f"
+      }
+    },
+    {
+      "id": "entity_deduct_20",
+      "label": "20% 자기부담금",
+      "type": "deductible",
+      "color": "#fb923c",
+      "size": 20,
+      "metadata": {
+        "description": "상해 치료비의 자기부담금",
+        "source_text": "상해 치료비의 경우 20%의 자기부담금이 적용됩니다",
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "document_id": "38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f"
+      }
+    },
+    {
+      "id": "entity_exclusion_intent",
+      "label": "고의적 사고",
+      "type": "exclusion",
+      "color": "#dc2626",
+      "size": 20,
+      "metadata": {
+        "description": "피보험자의 고의로 발생한 사고는 면책",
+        "source_text": "피보험자의 고의적 사고",
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "document_id": "38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f"
+      }
+    },
+    {
+      "id": "entity_exclusion_war",
+      "label": "전쟁/폭동",
+      "type": "exclusion",
+      "color": "#dc2626",
+      "size": 20,
+      "metadata": {
+        "description": "전쟁, 혁명, 내란, 폭동으로 인한 손해는 면책",
+        "source_text": "전쟁, 혁명, 내란, 폭동",
+        "insurer": "삼성화재",
+        "product_type": "자동차보험",
+        "document_id": "38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge_i2t_삼성화재_자동차보험",
+      "source": "insurer_0",
+      "target": "type_0",
+      "label": "제공",
+      "type": "provides"
+    },
+    {
+      "id": "edge_t2d_0",
+      "source": "type_0",
+      "target": "doc_405c0760-57e3-4ae1-9e19-1a9ecc1b59a3",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_1",
+      "source": "type_0",
+      "target": "doc_0dfa7ac9-0956-4409-9d12-8582b8b167a1",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_2",
+      "source": "type_0",
+      "target": "doc_29d49bac-05a1-46f6-9438-64d9917e5dec",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_3",
+      "source": "type_0",
+      "target": "doc_166c4a54-0831-4271-a990-5eca90c7fa3b",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_4",
+      "source": "type_0",
+      "target": "doc_ffe98e4f-b5be-42b1-aae5-e651242a791b",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_5",
+      "source": "type_0",
+      "target": "doc_e81c3eb9-610e-413d-a48d-568ca63e99d0",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_6",
+      "source": "type_0",
+      "target": "doc_cd024ff7-f3ed-4790-83af-c7d646326f89",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_7",
+      "source": "type_0",
+      "target": "doc_55089dff-ec1b-4d45-b70f-bcce8e4a438b",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_8",
+      "source": "type_0",
+      "target": "doc_2a92d88d-3279-4039-9d31-6796af9501f4",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_9",
+      "source": "type_0",
+      "target": "doc_de721865-82c1-4b71-b2e2-2af18c36c1da",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_10",
+      "source": "type_0",
+      "target": "doc_48c446dd-9099-4a0f-b321-417dcebb4880",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_11",
+      "source": "type_0",
+      "target": "doc_c8b803a6-1af7-4d20-981f-6ba6286c49de",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_12",
+      "source": "type_0",
+      "target": "doc_09f0e566-0bcc-4fda-9da5-091034a706ff",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_13",
+      "source": "type_0",
+      "target": "doc_aa19cfab-f89d-4409-9dc0-a17731d7662b",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_14",
+      "source": "type_0",
+      "target": "doc_b2faef49-1dc3-4c86-8ff6-0c29a93b8a15",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_15",
+      "source": "type_0",
+      "target": "doc_159ff425-7b3e-4837-ac8e-883a7b4ec2c7",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_16",
+      "source": "type_0",
+      "target": "doc_fc904499-18aa-484c-8d9a-b7ea7ab3e492",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_17",
+      "source": "type_0",
+      "target": "doc_296be5eb-1ca3-48df-be5a-3709d60944e4",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_18",
+      "source": "type_0",
+      "target": "doc_b77c4c0d-b517-4677-b1e5-8e511cf3db90",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_19",
+      "source": "type_0",
+      "target": "doc_97ae911a-f086-4479-ac31-5cb93614d9a2",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_20",
+      "source": "type_0",
+      "target": "doc_c3a19173-ecbf-49db-a4d5-68a98b5d25ec",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_21",
+      "source": "type_0",
+      "target": "doc_4b345eba-ac31-4e66-a75a-b1ce76a8b237",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_22",
+      "source": "type_0",
+      "target": "doc_64aea3ef-d7c7-4277-a203-f00ff37591ba",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_23",
+      "source": "type_0",
+      "target": "doc_0a819d32-056f-455e-986e-b6d9d57f63ff",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_24",
+      "source": "type_0",
+      "target": "doc_f5c66e50-605d-42d1-b9ba-bf8d69b37300",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_25",
+      "source": "type_0",
+      "target": "doc_3582a4e5-5367-4690-8e49-68e240916f2e",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_26",
+      "source": "type_0",
+      "target": "doc_359acae9-6fa0-40f4-9d53-6529721f10a8",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_27",
+      "source": "type_0",
+      "target": "doc_22c4c3e3-2d3e-4a5d-92dd-34be24662806",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_28",
+      "source": "type_0",
+      "target": "doc_a49df24b-cc07-4afa-a441-7ecc81fbed2f",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_29",
+      "source": "type_0",
+      "target": "doc_52e7fdc3-5568-4e38-a8cd-054f78456416",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_30",
+      "source": "type_0",
+      "target": "doc_35834788-fcc4-4693-8c77-48dc8614ae25",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_31",
+      "source": "type_0",
+      "target": "doc_8a551c6b-e6bd-4c3e-87d1-c76751813b03",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_32",
+      "source": "type_0",
+      "target": "doc_6770d69b-6434-4d09-9a5a-4145d98a0bfc",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_33",
+      "source": "type_0",
+      "target": "doc_00d9c467-fe0b-4b2f-9abf-9fdcfd4d35cb",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_34",
+      "source": "type_0",
+      "target": "doc_3e669c02-4306-4671-9fba-9055ee88c7dc",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_35",
+      "source": "type_0",
+      "target": "doc_5a4c3719-5df7-4337-90a4-91ed5342330f",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_36",
+      "source": "type_0",
+      "target": "doc_2dd267fb-b4e6-42af-adfe-661dbe8c49b3",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_37",
+      "source": "type_0",
+      "target": "doc_54510cfe-f68c-4734-9053-0f630359a971",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_38",
+      "source": "type_0",
+      "target": "doc_05e390e0-d5db-44db-bd5b-85f6b21d2258",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_39",
+      "source": "type_0",
+      "target": "doc_ce78599d-40b6-484e-96f6-e72e758aaaed",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_40",
+      "source": "type_0",
+      "target": "doc_4a8ebf54-1602-4d84-8f94-77c853a6fe7a",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_41",
+      "source": "type_0",
+      "target": "doc_d421bcf7-495e-4c05-a4e4-b57e94fd02bf",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_42",
+      "source": "type_0",
+      "target": "doc_88be39db-ce52-4344-8255-a2bab77edaed",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_43",
+      "source": "type_0",
+      "target": "doc_55f775a7-d8a7-408a-8c0e-67b8e1c2293b",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_44",
+      "source": "type_0",
+      "target": "doc_f313fc62-ec35-449e-974d-c55d2e46b1b3",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_45",
+      "source": "type_0",
+      "target": "doc_98a57324-c78a-48f2-99f3-8e765b060ebf",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_46",
+      "source": "type_0",
+      "target": "doc_d4e83ff6-916d-42e3-b082-ab0cd2e0ae8e",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_47",
+      "source": "type_0",
+      "target": "doc_05ba689e-6d70-43cd-938b-40e7a5aa074c",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_48",
+      "source": "type_0",
+      "target": "doc_69343f9d-8235-433a-98b4-495f2c1434e4",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_i2t_메트라이프생명_기타",
+      "source": "insurer_1",
+      "target": "type_1",
+      "label": "제공",
+      "type": "provides"
+    },
+    {
+      "id": "edge_t2d_49",
+      "source": "type_1",
+      "target": "doc_acc55748-1683-4399-afbc-f0bc654499ac",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_i2t_메트라이프생명_연금보험",
+      "source": "insurer_1",
+      "target": "type_2",
+      "label": "제공",
+      "type": "provides"
+    },
+    {
+      "id": "edge_t2d_50",
+      "source": "type_2",
+      "target": "doc_19cf7d5f-b16c-408e-b6c5-e1d2131ee5af",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_51",
+      "source": "type_2",
+      "target": "doc_4ee5193e-f404-4c3c-a191-dbcb91bbdf83",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_52",
+      "source": "type_0",
+      "target": "doc_a9b6f506-714e-4496-8e62-d8b197e51eeb",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_53",
+      "source": "type_0",
+      "target": "doc_f741fb1d-4474-483e-9491-1642320ac15a",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_54",
+      "source": "type_0",
+      "target": "doc_15738e20-f324-4546-a18c-248cc0a4c0ac",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_55",
+      "source": "type_0",
+      "target": "doc_cac6b94d-dfda-49b0-a13c-79dc440ef1f0",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_i2t_메트라이프생명_종신보험",
+      "source": "insurer_1",
+      "target": "type_3",
+      "label": "제공",
+      "type": "provides"
+    },
+    {
+      "id": "edge_t2d_56",
+      "source": "type_3",
+      "target": "doc_7b314313-5203-4027-a5ba-debdebf0a567",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_57",
+      "source": "type_2",
+      "target": "doc_2da35610-0a1e-407c-81be-03d145272d44",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_58",
+      "source": "type_3",
+      "target": "doc_7e39d5e1-b652-4d2a-aacb-a437a10dba72",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_59",
+      "source": "type_2",
+      "target": "doc_f2762b78-b69a-4a4c-b3d4-15ccb8f658ca",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_60",
+      "source": "type_2",
+      "target": "doc_e1c604f3-226d-4ec1-8411-8cbd059138cd",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_61",
+      "source": "type_2",
+      "target": "doc_e6ad0330-7fb6-4fb5-b4fb-50df6ecb76f1",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_62",
+      "source": "type_2",
+      "target": "doc_770363fd-c5a9-4593-9cf1-ae32052a1ca7",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_63",
+      "source": "type_3",
+      "target": "doc_cc6b2d3f-a20d-400e-9932-883b070a3abc",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_64",
+      "source": "type_1",
+      "target": "doc_ee1bb48e-3425-438c-afa3-79ac48451525",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_65",
+      "source": "type_1",
+      "target": "doc_87f04d7f-285e-4a1d-8a33-62eb10efad11",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_66",
+      "source": "type_3",
+      "target": "doc_dccf4b4c-2ceb-485a-b6d0-25c27d151b6a",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_67",
+      "source": "type_1",
+      "target": "doc_986b5bf6-b32d-4ab1-bac5-ec7fb0aa6159",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_68",
+      "source": "type_1",
+      "target": "doc_0e4765d9-249c-468c-9212-61d6f1b85efa",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_i2t_메트라이프생명_정기보험",
+      "source": "insurer_1",
+      "target": "type_4",
+      "label": "제공",
+      "type": "provides"
+    },
+    {
+      "id": "edge_t2d_69",
+      "source": "type_4",
+      "target": "doc_3c897939-931d-4070-891f-dcee31ab0d2b",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_t2d_70",
+      "source": "type_4",
+      "target": "doc_30607a58-2330-446a-bd23-7ed9ba7fd55f",
+      "label": "포함",
+      "type": "contains"
+    },
+    {
+      "id": "edge_e2d_entity_death_benefit_1",
+      "source": "entity_death_benefit_1",
+      "target": "doc_38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f",
+      "label": "출처",
+      "type": "from_document"
+    },
+    {
+      "id": "edge_e2d_entity_amount_100m",
+      "source": "entity_amount_100m",
+      "target": "doc_38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f",
+      "label": "출처",
+      "type": "from_document"
+    },
+    {
+      "id": "edge_e2d_entity_condition_traffic",
+      "source": "entity_condition_traffic",
+      "target": "doc_38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f",
+      "label": "출처",
+      "type": "from_document"
+    },
+    {
+      "id": "edge_e2d_entity_disability",
+      "source": "entity_disability",
+      "target": "doc_38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f",
+      "label": "출처",
+      "type": "from_document"
+    },
+    {
+      "id": "edge_e2d_entity_deduct_20",
+      "source": "entity_deduct_20",
+      "target": "doc_38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f",
+      "label": "출처",
+      "type": "from_document"
+    },
+    {
+      "id": "edge_e2d_entity_exclusion_intent",
+      "source": "entity_exclusion_intent",
+      "target": "doc_38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f",
+      "label": "출처",
+      "type": "from_document"
+    },
+    {
+      "id": "edge_e2d_entity_exclusion_war",
+      "source": "entity_exclusion_war",
+      "target": "doc_38db53ee-b0b9-4e76-8d8d-1c14b0a1f50f",
+      "label": "출처",
+      "type": "from_document"
+    },
+    {
+      "id": "edge_rel_entity_death_benefit_1_entity_amount_100m",
+      "source": "entity_death_benefit_1",
+      "target": "entity_amount_100m",
+      "label": "금액",
+      "type": "has_amount"
+    },
+    {
+      "id": "edge_rel_entity_death_benefit_1_entity_condition_traffic",
+      "source": "entity_death_benefit_1",
+      "target": "entity_condition_traffic",
+      "label": "조건",
+      "type": "requires"
+    },
+    {
+      "id": "edge_rel_entity_disability_entity_deduct_20",
+      "source": "entity_disability",
+      "target": "entity_deduct_20",
+      "label": "자기부담금",
+      "type": "has_deductible"
+    },
+    {
+      "id": "edge_rel_entity_death_benefit_1_entity_exclusion_intent",
+      "source": "entity_death_benefit_1",
+      "target": "entity_exclusion_intent",
+      "label": "면책",
+      "type": "excludes"
+    },
+    {
+      "id": "edge_rel_entity_death_benefit_1_entity_exclusion_war",
+      "source": "entity_death_benefit_1",
+      "target": "entity_exclusion_war",
+      "label": "면책",
+      "type": "excludes"
+    }
+  ],
+  "metadata": {
+    "total_documents": 71,
+    "total_insurers": 2,
+    "total_product_types": 5,
+    "generated_at": "2025-12-03T06:16:56.468222Z",
+    "last_update": "2025-12-03 15:16:56"
+  }
+}

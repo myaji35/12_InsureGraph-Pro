@@ -64,6 +64,7 @@ class Settings(BaseSettings):
     UPSTAGE_API_KEY: str
     OPENAI_API_KEY: str
     ANTHROPIC_API_KEY: str
+    GOOGLE_API_KEY: str  # Gemini 1.5 Flash API key
 
     # JWT
     JWT_SECRET_KEY: str
@@ -76,6 +77,13 @@ class Settings(BaseSettings):
 
     # Logging
     LOG_LEVEL: str = "INFO"
+
+    # Hybrid PDF Extraction Settings
+    HYBRID_EXTRACTION_ENABLED: bool = True
+    HYBRID_STRATEGY: str = "smart"  # simple, smart, progressive, ml
+    HYBRID_COMPLEXITY_THRESHOLD: int = 70  # 0-100
+    HYBRID_QUALITY_THRESHOLD: float = 0.7  # 0.0-1.0
+    HYBRID_FILE_SIZE_THRESHOLD_MB: float = 5.0
 
     model_config = SettingsConfigDict(
         env_file=".env",
