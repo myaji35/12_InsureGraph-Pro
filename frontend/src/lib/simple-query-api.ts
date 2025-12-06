@@ -6,13 +6,15 @@
 
 import type { SimpleQueryRequest, SimpleQueryResponse } from '@/types/simple-query'
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3030/api'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api'
 const SIMPLE_QUERY_API = `${API_BASE_URL}/v1/query-simple`
 
 class SimpleQueryAPI {
   private async fetchWithAuth(url: string, options: RequestInit = {}) {
-    // Get token from localStorage
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null
+    // Get token from localStorage (check both 'access_token' and 'token' for compatibility)
+    const token = typeof window !== 'undefined'
+      ? (localStorage.getItem('access_token') || localStorage.getItem('token'))
+      : null
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',

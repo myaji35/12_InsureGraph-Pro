@@ -90,77 +90,80 @@ async def get_graph(
                 # WHERE 절 조합
                 where_clause = "WHERE " + " AND ".join(where_clauses) if where_clauses else ""
 
-                # 노드 조회 - 워커가 생성한 구조에 맞춤
+                # 연결된 서브그래프 조회 - 관계가 있는 노드만 가져오기
                 cypher_query = f"""
-                MATCH (n:Node)
+                MATCH (n)-[r]-(m)
                 {where_clause}
+                WITH DISTINCT n
                 RETURN
-                    n.id as id,
+                    n.entity_id as id,
                     n.type as type,
                     n.label as label,
-                    n.color as color,
-                    n.size as size,
-                    n.metadata as metadata
+                    labels(n)[0] as node_label,
+                    n.description as description
                 LIMIT $max_nodes
                 """
 
                 result = await session.run(cypher_query, **params)
 
                 nodes = []
-                node_id_map = {}  # id(node) -> n.id 매핑
                 async for record in result:
-                    node_custom_id = record["id"]
+                    node_id = record["id"]
                     node_type = record["type"] or "unknown"
                     label = record["label"] or "Unknown"
-                    color = record["color"] or "#6b7280"
-                    size = record["size"] or 20
+                    description = record["description"] or ""
 
-                    # metadata는 JSON 문자열로 저장되어 있을 수 있음
-                    import json
-                    metadata = record["metadata"]
-                    if isinstance(metadata, str):
-                        try:
-                            metadata = json.loads(metadata)
-                        except:
-                            metadata = {}
-                    elif metadata is None:
-                        metadata = {}
+                    # 타입별 색상 지정
+                    color_map = {
+                        "coverage_item": "#3b82f6",  # blue
+                        "benefit_amount": "#10b981",  # green
+                        "article": "#8b5cf6",  # purple
+                        "period": "#f59e0b",  # amber
+                        "exclusion": "#ef4444",  # red
+                        "rider": "#ec4899",  # pink
+                        "term": "#6366f1",  # indigo
+                        "payment_condition": "#14b8a6",  # teal
+                    }
+                    color = color_map.get(node_type, "#6b7280")
+
+                    # 타입별 크기
+                    size = 25 if node_type in ["coverage_item", "article"] else 20
 
                     nodes.append({
-                        "id": node_custom_id,
+                        "id": node_id,
                         "type": node_type,
                         "label": label,
                         "color": color,
                         "size": size,
-                        "metadata": metadata
+                        "metadata": {"description": description}
                     })
 
                 # id 리스트 생성 (관계 쿼리용)
                 node_ids = [n["id"] for n in nodes]
 
-                # 관계 조회 - 워커가 생성한 구조에 맞춤
+                # 관계 조회 - 모든 관계 타입 조회
                 if node_ids:
                     edge_query = """
-                    MATCH (source:Node)-[r:RELATES]->(target:Node)
-                    WHERE source.id IN $node_ids AND target.id IN $node_ids
+                    MATCH (source)-[r]->(target)
+                    WHERE source.entity_id IN $node_ids AND target.entity_id IN $node_ids
                     RETURN
-                        source.id as source_id,
-                        target.id as target_id,
-                        r.id as rel_id,
-                        r.label as rel_label,
-                        r.type as rel_type
+                        source.entity_id as source_id,
+                        target.entity_id as target_id,
+                        type(r) as rel_type,
+                        r.description as rel_description
                     """
 
                     result = await session.run(edge_query, node_ids=node_ids)
 
                     edges = []
                     async for record in result:
+                        rel_type = record["rel_type"]
                         edges.append({
-                            "id": record["rel_id"] or f"{record['source_id']}-{record['target_id']}",
+                            "id": f"{record['source_id']}-{rel_type}-{record['target_id']}",
                             "source": record["source_id"],
                             "target": record["target_id"],
-                            "type": record["rel_type"] or "relates",
-                            "label": record["rel_label"] or ""
+                            "type": rel_type,
+                            "label": record["rel_description"] or rel_type
                         })
                 else:
                     edges = []

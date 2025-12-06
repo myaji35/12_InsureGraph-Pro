@@ -79,7 +79,7 @@ export default function GraphPage() {
 
     // 초기 로드
     kgFetchGraphStats()
-    kgFetchGraphData({ limit: 500 })
+    kgFetchGraphData({ limit: 50 })
   }, [activeTab, kgFetchGraphData, kgFetchGraphStats])
 
   // 노드 수 변화 감지

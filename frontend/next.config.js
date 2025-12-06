@@ -16,6 +16,9 @@ const nextConfig = {
   // Vercel 배포 설정
   // 모든 Next.js 기능 지원 (Middleware, SSR, ISR 등)
 
+  // Production build output (for Docker standalone)
+  output: 'standalone',
+
   // 이미지 최적화 활성화 (Vercel은 자동 이미지 최적화 지원)
   images: {
     domains: ['localhost'], // 필요시 외부 이미지 도메인 추가

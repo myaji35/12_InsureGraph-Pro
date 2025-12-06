@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 export default function SimpleLoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('admin@insuregraph.com')
-  const [password, setPassword] = useState('admin123')
+  const [password, setPassword] = useState('Admin123!')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -16,7 +16,7 @@ export default function SimpleLoginPage() {
     setLoading(true)
 
     try {
-      const response = await fetch('http://localhost:3030/api/v1/auth/login', {
+      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ export default function SimpleLoginPage() {
 
           <div className="text-sm text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              기본 계정: admin@insuregraph.com / admin123
+              기본 계정: admin@insuregraph.com / Admin123!
             </p>
           </div>
         </form>

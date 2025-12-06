@@ -189,7 +189,7 @@ export default function AskPage() {
         query: question,
         limit: 20,
         use_traversal: true,
-        llm_provider: 'openai'
+        llm_provider: 'anthropic'
       })
 
       // 응답을 QueryResult 형식으로 변환

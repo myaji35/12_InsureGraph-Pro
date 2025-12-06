@@ -184,10 +184,11 @@ async def get_graph_data(
         if where_conditions:
             where_clause = "WHERE " + " AND ".join(where_conditions)
 
-        # 노드 조회
+        # 노드 조회 - 관계가 있는 노드만 조회 (연결된 그래프 보장)
         nodes_query = f"""
-        MATCH (n)
+        MATCH (n)-[r]-(m)
         {where_clause}
+        WITH DISTINCT n
         RETURN n
         LIMIT {limit}
         """
