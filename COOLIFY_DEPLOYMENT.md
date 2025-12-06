@@ -4,6 +4,17 @@
 - **Coolify URL**: http://58.225.113.125
 - **서버 IP**: 58.225.113.125
 
+## ⚠️ 포트 충돌 방지
+서버에 nginx와 다른 시스템이 이미 설치되어 있으므로, Coolify는 자동으로 사용 가능한 포트를 할당합니다.
+- Coolify는 기본적으로 리버스 프록시를 사용하여 포트 충돌을 방지합니다
+- 각 서비스는 내부 Docker 네트워크에서 격리되어 실행됩니다
+- 외부 접근은 Coolify가 자동으로 할당한 포트나 도메인을 통해 이루어집니다
+
+**권장 포트 설정** (Coolify UI에서 수동 지정 시):
+- Frontend: 18000 (기본 3000 대신)
+- Backend API: 18001 (기본 8000 대신)
+- Neo4j Browser: 17474 (기본 7474 대신)
+
 ---
 
 ## 📋 배포 단계
@@ -62,8 +73,8 @@ git push origin main
    - **Name**: `insuregraph-backend`
    - **Docker Compose File**: `docker-compose.coolify.yml`
    - **Service**: `backend`
-   - **Port**: `8080`
-   - **Public Port**: `8000`
+   - **Internal Port**: `8080` (컨테이너 내부 포트)
+   - **Public Port**: `18001` (nginx 충돌 방지를 위해 18001 사용)
 3. **Domain 설정** (선택사항):
    - Custom Domain: `api.yourdomain.com`
    - 또는 Coolify 자동 도메인 사용
@@ -78,16 +89,16 @@ git push origin main
    - **Name**: `insuregraph-frontend`
    - **Docker Compose File**: `docker-compose.coolify.yml`
    - **Service**: `frontend`
-   - **Port**: `3000`
-   - **Public Port**: `3000`
+   - **Internal Port**: `3000` (컨테이너 내부 포트)
+   - **Public Port**: `18000` (nginx 충돌 방지를 위해 18000 사용)
 3. **Domain 설정**:
    - Custom Domain: `yourdomain.com`
    - 또는 Coolify 자동 도메인 사용
 4. **Environment Variables**:
    ```
+   NEXT_PUBLIC_API_URL=http://58.225.113.125:18001
+   # 또는 도메인 사용 시
    NEXT_PUBLIC_API_URL=https://api.yourdomain.com
-   # 또는 IP 사용
-   NEXT_PUBLIC_API_URL=http://58.225.113.125:8000
    ```
 5. **Create** 클릭
 
@@ -115,7 +126,9 @@ git push origin main
 2. 설정:
    - **Name**: `insuregraph-neo4j`
    - **Image**: `neo4j:5.14`
-   - **Port**: `7474,7687`
+   - **Internal Ports**: `7474,7687`
+   - **Public Port (Browser)**: `17474` (nginx 충돌 방지를 위해 17474 사용)
+   - **Public Port (Bolt)**: `17687` (nginx 충돌 방지를 위해 17687 사용)
    - **Environment Variables**:
      ```
      NEO4J_AUTH=neo4j/Neo4j2024!Graph!Secure
@@ -123,6 +136,10 @@ git push origin main
      NEO4J_dbms_security_procedures_unrestricted=apoc.*
      ```
 3. **Create** 클릭
+
+**⚠️ 포트 매핑 확인**:
+- Neo4j Browser를 사용할 때는 `http://58.225.113.125:17474` 로 접속
+- Backend에서 Neo4j Bolt 연결 시 환경변수에 `NEO4J_URI=bolt://insuregraph-neo4j:7687` 사용 (내부 네트워크)
 
 ---
 
@@ -162,13 +179,13 @@ ANTHROPIC_API_KEY=your-anthropic-api-key-here
 ENVIRONMENT=production
 DEBUG=false
 LOG_LEVEL=INFO
-CORS_ORIGINS=http://58.225.113.125:3000
+CORS_ORIGINS=http://58.225.113.125:18000
 ```
 
 #### Frontend 환경변수
 
 ```env
-NEXT_PUBLIC_API_URL=http://58.225.113.125:8000
+NEXT_PUBLIC_API_URL=http://58.225.113.125:18001
 NODE_ENV=production
 ```
 
@@ -197,25 +214,27 @@ alembic upgrade head
 
 ---
 
-## 🌐 접속 URL
+## 🌐 접속 URL (포트 충돌 방지 버전)
 
 배포가 완료되면:
 
 - **Frontend**:
   - Coolify 도메인: `https://insuregraph-frontend.coolify.yourdomain.com`
-  - IP 접속: `http://58.225.113.125:3000`
+  - IP 접속: `http://58.225.113.125:18000` ⚠️ (기본 3000 대신 18000 사용)
 
 - **Backend API**:
   - Coolify 도메인: `https://insuregraph-backend.coolify.yourdomain.com`
-  - IP 접속: `http://58.225.113.125:8000`
+  - IP 접속: `http://58.225.113.125:18001` ⚠️ (기본 8000 대신 18001 사용)
 
 - **API Docs**:
-  - `http://58.225.113.125:8000/docs`
+  - `http://58.225.113.125:18001/docs`
 
 - **Neo4j Browser**:
-  - `http://58.225.113.125:7474`
+  - `http://58.225.113.125:17474` ⚠️ (기본 7474 대신 17474 사용)
   - Username: `neo4j`
   - Password: `Neo4j2024!Graph!Secure`
+
+**포트 변경 이유**: nginx와 다른 시스템이 이미 설치되어 있어 기본 포트(3000, 8000, 7474)와 충돌하지 않도록 18xxx 대역 포트를 사용합니다.
 
 ---
 
