@@ -7,6 +7,8 @@ import { Search, FileText, X, Sparkles } from 'lucide-react'
 import { simpleQueryAPI } from '@/lib/simple-query-api'
 import type { SimpleQueryResponse } from '@/types/simple-query'
 import { getIntentLabel, getIntentIcon } from '@/types/simple-query'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 interface Document {
   id: number
@@ -230,9 +232,9 @@ export default function AskPage() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 bg-gradient-to-b from-white to-gray-50 dark:from-dark-bg dark:to-gray-900">
+      <div className="min-h-screen flex flex-col items-center justify-center px-2.5 py-8 bg-gradient-to-b from-white to-gray-50 dark:from-dark-bg dark:to-gray-900">
         {/* Header */}
-        <div className="w-full max-w-3xl mb-12 text-center">
+        <div className="w-full mb-12 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             <Sparkles className="w-8 h-8 text-primary-600 dark:text-primary-400" />
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
@@ -245,121 +247,7 @@ export default function AskPage() {
         </div>
 
         {/* Main Content */}
-        <div className="w-full max-w-3xl">
-          {/* Results */}
-          {results.length > 0 && (
-            <div className="mb-8 space-y-4">
-              {results.map((result) => (
-                <div
-                  key={result.id}
-                  className="bg-white dark:bg-dark-surface rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden"
-                >
-                  {/* Question */}
-                  <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50">
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-                        <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-base font-medium text-gray-900 dark:text-gray-100">
-                          {result.question}
-                        </p>
-                        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                          <span>{result.timestamp.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
-                          <span>•</span>
-                          <span className="flex items-center gap-1">
-                            <span>{getIntentIcon(result.intent)}</span>
-                            <span>{getIntentLabel(result.intent)}</span>
-                          </span>
-                          <span>•</span>
-                          <span className={`px-2 py-0.5 rounded ${
-                            result.validation.passed
-                              ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                              : 'bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
-                          }`}>
-                            신뢰도 {(result.confidence * 100).toFixed(0)}%
-                          </span>
-                          {result.insurers.length > 0 && (
-                            <>
-                              <span>•</span>
-                              <div className="flex flex-wrap gap-1">
-                                {result.insurers.slice(0, 3).map((insurer, idx) => (
-                                  <span key={idx} className="px-2 py-0.5 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded">
-                                    {insurer}
-                                  </span>
-                                ))}
-                                {result.insurers.length > 3 && (
-                                  <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">
-                                    +{result.insurers.length - 3}
-                                  </span>
-                                )}
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Answer */}
-                  <div className="px-6 py-5">
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
-                        <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
-                          {result.answer}
-                        </p>
-
-                        {/* Sources and Stats */}
-                        {result.sources.length > 0 && (
-                          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between mb-3">
-                              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                                참고 문서 ({result.sources.length}개)
-                              </p>
-                              <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
-                                <span>검색 결과: {result.search_results_count}개</span>
-                                {result.graph_paths_count > 0 && (
-                                  <>
-                                    <span>•</span>
-                                    <span>그래프 경로: {result.graph_paths_count}개</span>
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              {result.sources.slice(0, 5).map((source, idx) => (
-                                <div key={idx} className="flex items-start gap-2 p-2 rounded bg-gray-50 dark:bg-gray-800/50">
-                                  <FileText className="w-3 h-3 flex-shrink-0 mt-0.5 text-primary-500" />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-2">
-                                      {source.text}
-                                    </p>
-                                    <div className="mt-1 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                                      <span className="px-1.5 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded">
-                                        {source.node_type}
-                                      </span>
-                                      <span>•</span>
-                                      <span>관련도: {(source.relevance_score * 100).toFixed(0)}%</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
+        <div className="w-full">
           {/* Selected Documents */}
           {selectedDocs.length > 0 && (
             <div className="mb-4 flex flex-wrap gap-2">
@@ -367,7 +255,7 @@ export default function AskPage() {
                 <div
                   key={doc.id}
                   className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary-50 dark:bg-primary-900/20
-                           text-primary-700 dark:text-primary-300 rounded-full text-sm border border-primary-200 dark:border-primary-800"
+                           text-primary-700 dark:text-primary-300 rounded-full text-lg border border-primary-200 dark:border-primary-800"
                 >
                   <FileText className="w-4 h-4" />
                   <span className="font-medium">{doc.title}</span>
@@ -383,7 +271,7 @@ export default function AskPage() {
           )}
 
           {/* Question Input Box */}
-          <div className="relative bg-white dark:bg-dark-surface rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <div className="relative bg-white dark:bg-dark-surface rounded-3xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden mb-8">
             {/* Textarea */}
             <textarea
               ref={textareaRef}
@@ -392,7 +280,7 @@ export default function AskPage() {
               onKeyDown={handleKeyDown}
               placeholder="예: 암 진단 시 보장 내용은 무엇인가요?"
               className="w-full px-6 py-5 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
-                       bg-transparent resize-none focus:outline-none text-lg min-h-[80px] max-h-[400px]"
+                       bg-transparent resize-none focus:outline-none text-xl min-h-[80px] max-h-[400px]"
               rows={1}
             />
 
@@ -405,7 +293,7 @@ export default function AskPage() {
                     setShowInsurerSelector(showInsurerSelector === 'life' ? null : 'life')
                     setShowDocSelector(false)
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-lg rounded-lg transition-colors ${
                     showInsurerSelector === 'life'
                       ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
@@ -421,7 +309,7 @@ export default function AskPage() {
                     setShowInsurerSelector(showInsurerSelector === 'nonlife' ? null : 'nonlife')
                     setShowDocSelector(false)
                   }}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 text-lg rounded-lg transition-colors ${
                     showInsurerSelector === 'nonlife'
                       ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-800'
@@ -437,7 +325,7 @@ export default function AskPage() {
                     setShowDocSelector(!showDocSelector)
                     setShowInsurerSelector(null)
                   }}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-400
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-lg text-gray-600 dark:text-gray-400
                            hover:bg-gray-200 dark:hover:bg-gray-800 rounded-lg transition-colors"
                 >
                   <FileText className="w-4 h-4" />
@@ -448,27 +336,36 @@ export default function AskPage() {
               {/* Submit Button */}
               <button
                 onClick={handleSubmit}
-                disabled={!question.trim()}
+                disabled={!question.trim() || isLoading}
                 className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 hover:bg-primary-700
                          disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed
                          text-white font-medium rounded-full transition-all shadow-lg hover:shadow-xl
                          disabled:shadow-none"
               >
-                <span>질문하기</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
+                {isLoading ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>생각하는 중...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>질문하기</span>
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </>
+                )}
               </button>
             </div>
           </div>
 
           {/* Insurer Selector Modal */}
           {showInsurerSelector && (
-            <div className="mt-4 bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="mb-4 bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               {/* Header */}
               <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${showInsurerSelector === 'life' ? 'bg-blue-500' : 'bg-emerald-500'}`}></div>
-                <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   {showInsurerSelector === 'life' ? '생명보험' : '손해보험'} 선택
                 </h3>
               </div>
@@ -487,14 +384,14 @@ export default function AskPage() {
                                    border border-gray-200 dark:border-gray-700"
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`w-7 h-7 rounded-full bg-gradient-to-br flex items-center justify-center text-white text-xs font-bold ${
+                            <div className={`w-9 h-9 rounded-full bg-gradient-to-br flex items-center justify-center text-white text-base font-bold ${
                               showInsurerSelector === 'life'
                                 ? 'from-blue-500 to-blue-600'
                                 : 'from-emerald-500 to-emerald-600'
                             }`}>
                               {insurer.name.slice(0, 2)}
                             </div>
-                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            <span className="text-lg font-medium text-gray-900 dark:text-gray-100">
                               {insurer.name}
                             </span>
                           </div>
@@ -532,7 +429,7 @@ export default function AskPage() {
 
           {/* Document Search Modal */}
           {showDocSelector && (
-            <div className="mt-4 bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="mb-4 bg-white dark:bg-dark-surface rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               {/* Search Input */}
               <div className="p-4 border-b border-gray-200 dark:border-gray-700">
                 <div className="relative">
@@ -591,9 +488,168 @@ export default function AskPage() {
           )}
 
           {/* Helper Text */}
-          <div className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          <div className="mb-6 text-center text-lg text-gray-500 dark:text-gray-400">
             <p>Shift + Enter로 줄바꿈 | Enter로 질문 전송</p>
           </div>
+
+          {/* Loading Indicator */}
+          {isLoading && (
+            <div className="mb-4 bg-white dark:bg-dark-surface rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+              <div className="px-6 py-8">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="relative">
+                    <div className="w-10 h-10 border-4 border-primary-200 dark:border-primary-900 border-t-primary-600 dark:border-t-primary-400 rounded-full animate-spin"></div>
+                    <Sparkles className="w-5 h-5 text-primary-600 dark:text-primary-400 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-medium text-gray-900 dark:text-gray-100">생각하는 중...</p>
+                    <p className="text-lg text-gray-500 dark:text-gray-400 mt-1">약관 검색 및 답변 생성 중입니다</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Results - Chat UI Style */}
+          {results.length > 0 && (
+            <div className="space-y-6">
+              {results.map((result) => (
+                <div key={result.id} className="space-y-4">
+                  {/* Question Box - Left aligned, compact */}
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
+                      <svg className="w-6 h-6 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 bg-white dark:bg-dark-surface rounded-2xl shadow-md border border-gray-200 dark:border-gray-700 px-5 py-4 max-w-4xl">
+                      <p className="text-xl font-medium text-gray-900 dark:text-gray-100">
+                        {result.question}
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-2 text-base text-gray-500 dark:text-gray-400">
+                        <span>{result.timestamp.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}</span>
+                        <span>•</span>
+                        <span className="flex items-center gap-1">
+                          <span>{getIntentIcon(result.intent)}</span>
+                          <span>{getIntentLabel(result.intent)}</span>
+                        </span>
+                        {result.insurers.length > 0 && (
+                          <>
+                            <span>•</span>
+                            <div className="flex flex-wrap gap-1">
+                              {result.insurers.slice(0, 3).map((insurer, idx) => (
+                                <span key={idx} className="px-2 py-0.5 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded">
+                                  {insurer}
+                                </span>
+                              ))}
+                              {result.insurers.length > 3 && (
+                                <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">
+                                  +{result.insurers.length - 3}
+                                </span>
+                              )}
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Answer Box - Indented right, prominent */}
+                  <div className="ml-8 flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">
+                      <Sparkles className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                    </div>
+                    <div className="flex-1 bg-white dark:bg-dark-surface rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+                      {/* Answer Header with LLM Model Info */}
+                      <div className="px-5 py-3 bg-emerald-50 dark:bg-emerald-900/20 border-b border-emerald-100 dark:border-emerald-800 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-base font-semibold text-emerald-700 dark:text-emerald-300">
+                            AI 답변
+                          </span>
+                          <span className={`px-2 py-0.5 rounded text-sm ${
+                            result.validation.passed
+                              ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                              : 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                          }`}>
+                            신뢰도 {(result.confidence * 100).toFixed(0)}%
+                          </span>
+                        </div>
+                        <span className="text-sm text-emerald-600 dark:text-emerald-400 font-mono">
+                          {result.llm_model}
+                        </span>
+                      </div>
+
+                      {/* Answer Content */}
+                      <div className="px-5 py-5">
+                        <div className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed markdown-content max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600 scrollbar-track-transparent">
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                              h1: ({node, ...props}) => <h1 className="text-3xl font-bold mt-4 mb-2 text-gray-900 dark:text-gray-100" {...props} />,
+                              h2: ({node, ...props}) => <h2 className="text-2xl font-bold mt-3 mb-2 text-gray-900 dark:text-gray-100" {...props} />,
+                              h3: ({node, ...props}) => <h3 className="text-xl font-bold mt-2 mb-1 text-gray-900 dark:text-gray-100" {...props} />,
+                              p: ({node, ...props}) => <p className="mb-3" {...props} />,
+                              ul: ({node, ...props}) => <ul className="list-disc list-inside mb-3 space-y-1" {...props} />,
+                              ol: ({node, ...props}) => <ol className="list-decimal list-inside mb-3 space-y-1" {...props} />,
+                              li: ({node, ...props}) => <li className="ml-2" {...props} />,
+                              strong: ({node, ...props}) => <strong className="font-bold text-gray-900 dark:text-gray-100" {...props} />,
+                              em: ({node, ...props}) => <em className="italic" {...props} />,
+                              code: ({node, inline, ...props}: any) =>
+                                inline
+                                  ? <code className="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded text-base font-mono" {...props} />
+                                  : <code className="block p-3 bg-gray-100 dark:bg-gray-800 rounded text-base font-mono overflow-x-auto" {...props} />,
+                              blockquote: ({node, ...props}) => <blockquote className="border-l-4 border-primary-500 pl-3 italic my-3 text-gray-600 dark:text-gray-400" {...props} />,
+                            }}
+                          >
+                            {result.answer}
+                          </ReactMarkdown>
+                        </div>
+
+                        {/* Sources and Stats */}
+                        {result.sources.length > 0 && (
+                          <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-between mb-3">
+                              <p className="text-base font-semibold text-gray-500 dark:text-gray-400">
+                                참고 문서 ({result.sources.length}개)
+                              </p>
+                              <div className="flex items-center gap-3 text-base text-gray-500 dark:text-gray-400">
+                                <span>검색 결과: {result.search_results_count}개</span>
+                                {result.graph_paths_count > 0 && (
+                                  <>
+                                    <span>•</span>
+                                    <span>그래프 경로: {result.graph_paths_count}개</span>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              {result.sources.slice(0, 5).map((source, idx) => (
+                                <div key={idx} className="flex items-start gap-2 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50">
+                                  <FileText className="w-4 h-4 flex-shrink-0 mt-1 text-primary-500" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-base text-gray-700 dark:text-gray-300 line-clamp-2">
+                                      {source.text}
+                                    </p>
+                                    <div className="mt-2 flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                                      <span className="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 rounded">
+                                        {source.node_type}
+                                      </span>
+                                      <span>•</span>
+                                      <span>관련도: {(source.relevance_score * 100).toFixed(0)}%</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

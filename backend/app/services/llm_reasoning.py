@@ -34,11 +34,19 @@ except ImportError:
     ANTHROPIC_AVAILABLE = False
     logger.warning("Anthropic not available - will use mock responses")
 
+try:
+    import google.generativeai as genai
+    GOOGLE_AVAILABLE = True
+except ImportError:
+    GOOGLE_AVAILABLE = False
+    logger.warning("Google Gemini not available - will use mock responses")
+
 
 class LLMProvider(str, Enum):
     """LLM provider options"""
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
+    GOOGLE = "google"
     MOCK = "mock"
 
 
@@ -88,6 +96,7 @@ class ReasoningResult:
     sources: List[Dict[str, Any]]  # Referenced sources
     reasoning_steps: List[str]  # Chain of thought
     provider: LLMProvider
+    model: str  # LLM model name
 
     def to_dict(self) -> Dict[str, Any]:
         return {
@@ -119,7 +128,8 @@ class LLMReasoning:
 1. 제공된 조문의 내용만을 근거로 답변하세요
 2. 조문을 직접 인용할 때는 조항 번호를 명시하세요 (예: "제10조에 따르면...")
 3. 전문 용어는 쉽게 풀어서 설명하세요
-4. 불확실한 경우 "제공된 약관에서 명확하지 않습니다"라고 말하세요""",
+4. 불확실한 경우 "제공된 약관에서 명확하지 않습니다"라고 말하세요
+5. 사과 표현(죄송합니다, 미안합니다 등)은 사용하지 마세요. 사실만을 명확하게 전달하세요""",
 
         QueryIntent.COMPARISON: """당신은 보험 상품 비교 전문가입니다. 제공된 약관들을 비교하여 차이점을 명확하게 설명해주세요.
 
@@ -127,7 +137,8 @@ class LLMReasoning:
 1. 보장 금액, 보장 범위, 면책 사항 등 핵심 차이점을 중심으로 설명하세요
 2. 각 항목별로 비교표 형식으로 정리하세요
 3. 장단점을 객관적으로 설명하세요
-4. 조문 출처를 명확히 밝히세요""",
+4. 조문 출처를 명확히 밝히세요
+5. 사과 표현은 사용하지 말고 사실만을 전달하세요""",
 
         QueryIntent.AMOUNT_FILTER: """당신은 보험금 전문가입니다. 보험금 금액과 관련된 질문에 답변해주세요.
 
@@ -135,7 +146,8 @@ class LLMReasoning:
 1. 보험금 금액을 명확하게 제시하세요
 2. 보험금 지급 조건을 함께 설명하세요
 3. 면책 사항이나 제한 사항도 반드시 언급하세요
-4. 금액이 다른 경우 (예: 질병별 차등) 구분하여 설명하세요""",
+4. 금액이 다른 경우 (예: 질병별 차등) 구분하여 설명하세요
+5. 사과 표현은 사용하지 말고 사실만을 전달하세요""",
 
         QueryIntent.COVERAGE_CHECK: """당신은 보험 보장 분석 전문가입니다. 특정 질병이나 상황이 보장되는지 확인해주세요.
 
@@ -143,7 +155,8 @@ class LLMReasoning:
 1. 보장 여부를 명확히 답변하세요 (보장함/보장안함/조건부보장)
 2. 보장 조건이 있다면 상세히 설명하세요
 3. 보험금 금액도 함께 안내하세요
-4. 면책 사항을 반드시 확인하세요""",
+4. 면책 사항을 반드시 확인하세요
+5. 사과 표현은 사용하지 말고 사실만을 전달하세요""",
 
         QueryIntent.EXCLUSION_CHECK: """당신은 보험 면책 사항 전문가입니다. 면책 사항을 정확하게 안내해주세요.
 
@@ -151,7 +164,8 @@ class LLMReasoning:
 1. 면책 사항을 명확하게 나열하세요
 2. 각 면책 사항이 적용되는 조건을 설명하세요
 3. 면책 기간이 있다면 명시하세요 (예: 계약일로부터 90일)
-4. 예외 사항이 있다면 함께 설명하세요""",
+4. 예외 사항이 있다면 함께 설명하세요
+5. 사과 표현은 사용하지 말고 사실만을 전달하세요""",
 
         QueryIntent.PERIOD_CHECK: """당신은 보험 기간 전문가입니다. 대기 기간, 보험 기간 등 기간 관련 질문에 답변해주세요.
 
@@ -159,7 +173,8 @@ class LLMReasoning:
 1. 기간을 명확하게 제시하세요
 2. 기간의 시작점과 종료점을 명확히 하세요
 3. 기간 중 적용되는 조건을 설명하세요
-4. 기간별로 보장 내용이 다르다면 구분하여 설명하세요""",
+4. 기간별로 보장 내용이 다르다면 구분하여 설명하세요
+5. 사과 표현은 사용하지 말고 사실만을 전달하세요""",
     }
 
     USER_PROMPT_TEMPLATE = """다음 보험 약관 정보를 바탕으로 질문에 답변해주세요.
@@ -176,7 +191,7 @@ class LLMReasoning:
 
     def __init__(
         self,
-        provider: LLMProvider = LLMProvider.OPENAI,
+        provider: LLMProvider = LLMProvider.GOOGLE,
         model: Optional[str] = None,
         temperature: float = 0.1,
     ):
@@ -184,7 +199,7 @@ class LLMReasoning:
         Initialize LLM reasoning service.
 
         Args:
-            provider: LLM provider (openai, anthropic, mock)
+            provider: LLM provider (openai, anthropic, google, mock)
             model: Model name (optional, uses defaults)
             temperature: LLM temperature (0.0-1.0)
         """
@@ -199,12 +214,15 @@ class LLMReasoning:
                 self.model = "gpt-4o-mini"
             elif provider == LLMProvider.ANTHROPIC:
                 self.model = "claude-3-5-sonnet-20241022"
+            elif provider == LLMProvider.GOOGLE:
+                self.model = "gemini-2.5-flash"
             else:
                 self.model = "mock"
 
         # Initialize clients
         self.openai_client = None
         self.anthropic_client = None
+        self.gemini_model = None
 
         if provider == LLMProvider.OPENAI and OPENAI_AVAILABLE:
             try:
@@ -220,6 +238,35 @@ class LLMReasoning:
                 logger.info(f"Anthropic client initialized with model: {self.model}")
             except Exception as e:
                 logger.warning(f"Failed to initialize Anthropic: {e}")
+                self.provider = LLMProvider.MOCK
+
+        elif provider == LLMProvider.GOOGLE and GOOGLE_AVAILABLE:
+            try:
+                api_key = settings.GOOGLE_API_KEY
+                logger.info(f"Initializing Gemini with API key: {api_key[:10]}...{api_key[-4:] if api_key else 'NONE'}")
+
+                if not api_key:
+                    raise ValueError("GOOGLE_API_KEY is not set")
+
+                genai.configure(api_key=api_key)
+                self.gemini_model = genai.GenerativeModel(
+                    model_name=self.model,
+                    generation_config={
+                        "temperature": self.temperature,
+                        "max_output_tokens": 2000,
+                    }
+                )
+                logger.info(
+                    f"✅ Google Gemini initialized:\n"
+                    f"   Model: {self.model}\n"
+                    f"   Temperature: {self.temperature}\n"
+                    f"   Max tokens: 2000\n"
+                    f"   API key: {api_key[:10]}...{api_key[-4:]}"
+                )
+            except Exception as e:
+                logger.error(f"Failed to initialize Google Gemini: {type(e).__name__}: {e}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
                 self.provider = LLMProvider.MOCK
 
         else:
@@ -287,6 +334,8 @@ class LLMReasoning:
             answer, reasoning_steps = self._reason_openai(system_prompt, user_prompt)
         elif self.provider == LLMProvider.ANTHROPIC:
             answer, reasoning_steps = self._reason_anthropic(system_prompt, user_prompt)
+        elif self.provider == LLMProvider.GOOGLE:
+            answer, reasoning_steps = self._reason_gemini(system_prompt, user_prompt)
         else:
             answer, reasoning_steps = self._reason_mock(context)
 
@@ -303,6 +352,7 @@ class LLMReasoning:
             sources=sources,
             reasoning_steps=reasoning_steps,
             provider=self.provider,
+            model=self.model,
         )
 
         logger.info(f"Generated answer for query: {context.query[:50]}... (confidence: {confidence:.2f})")
@@ -361,6 +411,60 @@ class LLMReasoning:
             logger.error(f"Anthropic API error: {e}")
             return self._reason_mock_fallback()
 
+    def _reason_gemini(self, system_prompt: str, user_prompt: str) -> tuple[str, List[str]]:
+        """Generate answer using Google Gemini"""
+        if not self.gemini_model:
+            logger.warning("Gemini model not available, using mock")
+            return self._reason_mock_fallback()
+
+        try:
+            # Combine system and user prompts for Gemini
+            full_prompt = f"{system_prompt}\n\n{user_prompt}"
+            logger.info(f"🤖 Calling Gemini API: model={self.model}, temp={self.temperature}, prompt_len={len(full_prompt)}")
+
+            response = self.gemini_model.generate_content(full_prompt)
+
+            # Detailed response debugging
+            logger.debug(f"Gemini response object: {response}")
+            logger.debug(f"Gemini response.prompt_feedback: {getattr(response, 'prompt_feedback', 'N/A')}")
+            logger.debug(f"Gemini response.candidates: {getattr(response, 'candidates', 'N/A')}")
+
+            # Check if response was blocked
+            if hasattr(response, 'prompt_feedback'):
+                feedback = response.prompt_feedback
+                if hasattr(feedback, 'block_reason'):
+                    logger.error(f"❌ Gemini blocked response! Block reason: {feedback.block_reason}")
+                    return self._reason_mock_fallback()
+
+            # Try to get text
+            if not hasattr(response, 'text') or not response.text:
+                logger.error(f"❌ Gemini response has no text. Parts: {getattr(response, 'parts', 'N/A')}")
+                # Try alternative access
+                if hasattr(response, 'candidates') and response.candidates:
+                    candidate = response.candidates[0]
+                    if hasattr(candidate, 'content') and hasattr(candidate.content, 'parts'):
+                        answer = ' '.join([part.text for part in candidate.content.parts if hasattr(part, 'text')])
+                        if answer:
+                            logger.info(f"✅ Gemini answer extracted via candidates: {len(answer)} chars")
+                            reasoning_steps = [f"Google Gemini ({self.model}) reasoning completed"]
+                            return answer, reasoning_steps
+
+                logger.error("❌ Could not extract text from Gemini response")
+                return self._reason_mock_fallback()
+
+            answer = response.text
+            logger.info(f"✅ Gemini answer generated: {len(answer)} characters, model={self.model}")
+            logger.debug(f"Answer preview: {answer[:200]}...")
+            reasoning_steps = [f"Google Gemini ({self.model}) reasoning completed"]
+
+            return answer, reasoning_steps
+
+        except Exception as e:
+            logger.error(f"❌ Google Gemini API error: {type(e).__name__}: {e}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            return self._reason_mock_fallback()
+
     def _reason_mock(self, context: ReasoningContext) -> tuple[str, List[str]]:
         """Generate mock answer for testing"""
         answer_parts = [
@@ -395,21 +499,38 @@ class LLMReasoning:
 
     def _reason_mock_fallback(self) -> tuple[str, List[str]]:
         """Fallback mock response"""
-        answer = "죄송합니다. LLM 서비스를 사용할 수 없어 답변을 생성할 수 없습니다. 관리자에게 문의해주세요."
-        reasoning_steps = ["LLM unavailable", "Returned fallback response"]
+        answer = (
+            "LLM 서비스에 일시적인 문제가 발생했습니다.\n\n"
+            "현재 검색된 문서는 다음과 같습니다:\n"
+            "- 검색 결과를 확인하여 관련 정보를 찾아보세요.\n\n"
+            "문제가 계속되면 관리자에게 문의해주세요."
+        )
+        reasoning_steps = ["LLM unavailable", "Returned fallback response without apology"]
         return answer, reasoning_steps
 
     def _extract_sources(self, context: ReasoningContext) -> List[Dict[str, Any]]:
-        """Extract source references from context"""
+        """Extract source references from context and remove duplicates"""
         sources = []
+        seen_texts = set()  # Track seen text to remove duplicates
 
-        for result in context.search_results[:10]:
+        for result in context.search_results[:20]:  # Check more results
+            text_snippet = result.text[:200]
+
+            # Skip if we've seen similar text (deduplication)
+            if text_snippet in seen_texts:
+                continue
+
+            seen_texts.add(text_snippet)
             sources.append({
                 "node_id": result.node_id,
                 "node_type": result.node_type,
-                "text": result.text[:200],
+                "text": text_snippet,
                 "relevance_score": result.relevance_score,
             })
+
+            # Limit to 10 unique sources
+            if len(sources) >= 10:
+                break
 
         return sources
 

@@ -1,360 +1,501 @@
-# InsureGraph Pro - Coolify 배포 가이드
+# InsureGraph Pro - Coolify CLI 배포 가이드
 
-## 🎯 Coolify 접속 정보
-- **Coolify URL**: http://58.225.113.125
-- **서버 IP**: 58.225.113.125
+## 🎯 서버 환경 정보
+- **Coolify URL**: http://34.64.191.91
+- **서버 IP**: 34.64.191.91
+- **OS/Architecture**: Linux AMD64
+- **배포 방식**: CLI 기반 자동 배포
 
-## ⚠️ 포트 충돌 방지
-서버에 nginx와 다른 시스템이 이미 설치되어 있으므로, Coolify는 자동으로 사용 가능한 포트를 할당합니다.
-- Coolify는 기본적으로 리버스 프록시를 사용하여 포트 충돌을 방지합니다
-- 각 서비스는 내부 Docker 네트워크에서 격리되어 실행됩니다
-- 외부 접근은 Coolify가 자동으로 할당한 포트나 도메인을 통해 이루어집니다
+## 📋 빠른 배포 명령어
 
-**권장 포트 설정** (Coolify UI에서 수동 지정 시):
-- Frontend: 18000 (기본 3000 대신)
-- Backend API: 18001 (기본 8000 대신)
-- Neo4j Browser: 17474 (기본 7474 대신)
+**"Coolify에 배포"**라고만 말하면 다음 절차가 자동으로 실행됩니다:
+
+1. ✅ Linux AMD64 환경 확인
+2. ✅ 서버 IP를 34.64.191.91로 설정
+3. ✅ Docker 이미지를 AMD64 플랫폼으로 빌드
+4. ✅ 환경변수 자동 주입
+5. ✅ 포트 매핑 (18000, 18001, 17474, 17687)
+6. ✅ 배포 및 헬스체크
 
 ---
 
-## 📋 배포 단계
+## 🚀 CLI 기반 1-Step 배포
 
-### Step 1: Coolify 대시보드 접속
+### 전체 스택 배포 (한 번에)
 
 ```bash
-# 브라우저에서 접속
-open http://58.225.113.125
+#!/bin/bash
+# Coolify 서버에 전체 스택 배포
+
+COOLIFY_SERVER="34.64.191.91"
+PLATFORM="linux/amd64"
+
+# 1. 서버 접속 및 프로젝트 디렉토리 생성
+ssh root@$COOLIFY_SERVER << 'EOF'
+  mkdir -p /opt/insuregraph
+  cd /opt/insuregraph
+EOF
+
+# 2. 소스코드 전송
+rsync -avz --exclude 'node_modules' --exclude 'venv' --exclude '.next' \
+  ./ root@$COOLIFY_SERVER:/opt/insuregraph/
+
+# 3. 환경변수 파일 전송
+scp .coolify.env root@$COOLIFY_SERVER:/opt/insuregraph/.env
+
+# 4. Docker Compose로 배포 (AMD64 플랫폼 지정)
+ssh root@$COOLIFY_SERVER << 'EOF'
+  cd /opt/insuregraph
+
+  # AMD64 플랫폼으로 빌드 및 실행
+  DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose -f docker-compose.coolify.yml up -d --build
+
+  # 헬스체크
+  sleep 10
+  curl -f http://localhost:18001/health || echo "Backend not ready yet"
+  curl -f http://localhost:18000 || echo "Frontend not ready yet"
+EOF
+
+echo "✅ 배포 완료!"
+echo "🌐 Frontend: http://34.64.191.91:18000"
+echo "🌐 Backend: http://34.64.191.91:18001/docs"
 ```
 
-Coolify 로그인 페이지가 나타납니다.
-
 ---
 
-### Step 2: 새 프로젝트 생성
+## 🔧 서비스별 개별 배포
 
-1. **Dashboard** → **New Project** 클릭
-2. 프로젝트 이름: `InsureGraph Pro`
-3. 프로젝트 설명: `AI-powered Insurance Graph RAG Platform`
-4. **Create** 클릭
-
----
-
-### Step 3: Git Repository 연결
-
-#### Option 1: GitHub Repository 연결 (권장)
-
-1. **Add New Resource** → **Git Repository**
-2. Repository URL: GitHub 주소 입력
-   - 예: `https://github.com/YOUR_USERNAME/InsureGraph-Pro`
-3. Branch: `main`
-4. **Connect** 클릭
-
-#### Option 2: 로컬 파일 직접 업로드
-
-Coolify는 Git 연동을 권장하므로, 먼저 GitHub에 푸시하는 것이 좋습니다:
+### Backend API 배포
 
 ```bash
-cd "/Users/gangseungsig/Documents/02_GitHub/12_InsureGraph Pro"
+ssh root@34.64.191.91 << 'EOF'
+  cd /opt/insuregraph
+  DOCKER_DEFAULT_PLATFORM=linux/amd64 \
+    docker-compose -f docker-compose.coolify.yml up -d --build backend
 
-# GitHub에 푸시 (이미 설정되어 있다면 스킵)
-git add .
-git commit -m "Add Coolify deployment configuration"
-git push origin main
+  # 로그 확인
+  docker-compose -f docker-compose.coolify.yml logs -f backend
+EOF
+```
+
+### Frontend 배포
+
+```bash
+ssh root@34.64.191.91 << 'EOF'
+  cd /opt/insuregraph
+  DOCKER_DEFAULT_PLATFORM=linux/amd64 \
+    docker-compose -f docker-compose.coolify.yml up -d --build frontend
+
+  # 로그 확인
+  docker-compose -f docker-compose.coolify.yml logs -f frontend
+EOF
+```
+
+### Database 초기화
+
+```bash
+ssh root@34.64.191.91 << 'EOF'
+  cd /opt/insuregraph
+
+  # PostgreSQL, Redis, Neo4j 시작
+  DOCKER_DEFAULT_PLATFORM=linux/amd64 \
+    docker-compose -f docker-compose.coolify.yml up -d postgres redis neo4j
+
+  # 데이터베이스 마이그레이션 (PostgreSQL 준비 대기)
+  sleep 15
+  docker-compose -f docker-compose.coolify.yml exec backend alembic upgrade head
+EOF
 ```
 
 ---
 
-### Step 4: 서비스 생성
+## 📝 환경변수 설정 (.coolify.env)
 
-#### 4.1 Backend API 서비스
+서버에 배포하기 전에 환경변수를 설정하세요:
 
-1. **Add Service** → **Docker Compose**
-2. 설정:
-   - **Name**: `insuregraph-backend`
-   - **Docker Compose File**: `docker-compose.coolify.yml`
-   - **Service**: `backend`
-   - **Internal Port**: `8080` (컨테이너 내부 포트)
-   - **Public Port**: `18001` (nginx 충돌 방지를 위해 18001 사용)
-3. **Domain 설정** (선택사항):
-   - Custom Domain: `api.yourdomain.com`
-   - 또는 Coolify 자동 도메인 사용
-4. **Environment Variables** 추가:
-   - `.coolify.env` 파일의 내용을 복사해서 붙여넣기
-5. **Create** 클릭
+```bash
+# .coolify.env 파일
+# Linux AMD64 서버 (34.64.191.91) 전용 설정
 
-#### 4.2 Frontend 서비스
+# Application
+APP_NAME=InsureGraph Pro
+ENVIRONMENT=production
+DEBUG=false
 
-1. **Add Service** → **Docker Compose**
-2. 설정:
-   - **Name**: `insuregraph-frontend`
-   - **Docker Compose File**: `docker-compose.coolify.yml`
-   - **Service**: `frontend`
-   - **Internal Port**: `3000` (컨테이너 내부 포트)
-   - **Public Port**: `18000` (nginx 충돌 방지를 위해 18000 사용)
-3. **Domain 설정**:
-   - Custom Domain: `yourdomain.com`
-   - 또는 Coolify 자동 도메인 사용
-4. **Environment Variables**:
-   ```
-   NEXT_PUBLIC_API_URL=http://58.225.113.125:18001
-   # 또는 도메인 사용 시
-   NEXT_PUBLIC_API_URL=https://api.yourdomain.com
-   ```
-5. **Create** 클릭
-
-#### 4.3 Database 서비스들
-
-**PostgreSQL**:
-1. **Add Service** → **Database** → **PostgreSQL**
-2. 설정:
-   - **Name**: `insuregraph-postgres`
-   - **Version**: `15`
-   - **Database Name**: `insuregraph`
-   - **Username**: `insuregraph_user`
-   - **Password**: `.coolify.env`에서 복사
-3. **Create** 클릭
-
-**Redis**:
-1. **Add Service** → **Database** → **Redis**
-2. 설정:
-   - **Name**: `insuregraph-redis`
-   - **Version**: `7`
-3. **Create** 클릭
-
-**Neo4j**:
-1. **Add Service** → **Custom Docker**
-2. 설정:
-   - **Name**: `insuregraph-neo4j`
-   - **Image**: `neo4j:5.14`
-   - **Internal Ports**: `7474,7687`
-   - **Public Port (Browser)**: `17474` (nginx 충돌 방지를 위해 17474 사용)
-   - **Public Port (Bolt)**: `17687` (nginx 충돌 방지를 위해 17687 사용)
-   - **Environment Variables**:
-     ```
-     NEO4J_AUTH=neo4j/Neo4j2024!Graph!Secure
-     NEO4J_PLUGINS=["apoc"]
-     NEO4J_dbms_security_procedures_unrestricted=apoc.*
-     ```
-3. **Create** 클릭
-
-**⚠️ 포트 매핑 확인**:
-- Neo4j Browser를 사용할 때는 `http://58.225.113.125:17474` 로 접속
-- Backend에서 Neo4j Bolt 연결 시 환경변수에 `NEO4J_URI=bolt://insuregraph-neo4j:7687` 사용 (내부 네트워크)
-
----
-
-### Step 5: 환경변수 설정
-
-각 서비스의 **Environment** 탭에서 환경변수를 설정하세요.
-
-#### Backend 환경변수
-
-```env
-# Database
-POSTGRES_HOST=insuregraph-postgres
+# Database - PostgreSQL
+POSTGRES_HOST=postgres
 POSTGRES_PORT=5432
 POSTGRES_DB=insuregraph
 POSTGRES_USER=insuregraph_user
 POSTGRES_PASSWORD=InsureGraph2024!Prod!Secure
 
-# Redis
-REDIS_HOST=insuregraph-redis
-REDIS_PORT=6379
-
-# Neo4j
-NEO4J_URI=bolt://insuregraph-neo4j:7687
+# Database - Neo4j
+NEO4J_URI=bolt://neo4j:7687
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=Neo4j2024!Graph!Secure
+
+# Cache - Redis
+REDIS_HOST=redis
+REDIS_PORT=6379
 
 # Security
 SECRET_KEY=7K8mNpQ3rT9vX2bC5dF6gH8jK0lM4nP7qR9sT2uV5wX8yZ
 JWT_SECRET_KEY=3aB5cD7eF9gH2iJ4kL6mN8oP0qR2sT4uV6wX8yZ1aB3cD5
 
-# API Keys - Replace with your actual keys
-UPSTAGE_API_KEY=your-upstage-api-key-here
-OPENAI_API_KEY=your-openai-api-key-here
+# LLM API Keys
 ANTHROPIC_API_KEY=your-anthropic-api-key-here
+GOOGLE_API_KEY=your-google-api-key-here
+OPENAI_API_KEY=your-openai-api-key
+UPSTAGE_API_KEY=your-upstage-api-key
 
-# Environment
-ENVIRONMENT=production
-DEBUG=false
-LOG_LEVEL=INFO
-CORS_ORIGINS=http://58.225.113.125:18000
-```
+# CORS
+CORS_ORIGINS=http://frontend.34.64.191.91,http://34.64.191.91:18000,http://localhost:3000
 
-#### Frontend 환경변수
-
-```env
-NEXT_PUBLIC_API_URL=http://58.225.113.125:18001
-NODE_ENV=production
+# Frontend
+NEXT_PUBLIC_API_URL=http://api.34.64.191.91
 ```
 
 ---
 
-### Step 6: 배포 시작
+## 🌐 배포된 서비스 접속 정보
 
-1. **Backend 서비스**로 이동
-2. **Deploy** 버튼 클릭
-3. 빌드 로그 확인 (5-10분 소요)
-4. **Frontend 서비스**로 이동
-5. **Deploy** 버튼 클릭
-6. 빌드 로그 확인 (3-5분 소요)
+배포 완료 후 접속 URL (서브도메인 형식):
 
----
-
-### Step 7: 데이터베이스 마이그레이션
-
-배포가 완료되면 마이그레이션 실행:
-
-1. **Backend 서비스** → **Terminal** 탭
-2. 터미널에서 실행:
-```bash
-alembic upgrade head
-```
-
----
-
-## 🌐 접속 URL (포트 충돌 방지 버전)
-
-배포가 완료되면:
-
-- **Frontend**:
-  - Coolify 도메인: `https://insuregraph-frontend.coolify.yourdomain.com`
-  - IP 접속: `http://58.225.113.125:18000` ⚠️ (기본 3000 대신 18000 사용)
-
-- **Backend API**:
-  - Coolify 도메인: `https://insuregraph-backend.coolify.yourdomain.com`
-  - IP 접속: `http://58.225.113.125:18001` ⚠️ (기본 8000 대신 18001 사용)
-
-- **API Docs**:
-  - `http://58.225.113.125:18001/docs`
-
-- **Neo4j Browser**:
-  - `http://58.225.113.125:17474` ⚠️ (기본 7474 대신 17474 사용)
+- **Frontend**: http://frontend.34.64.191.91 (또는 http://34.64.191.91:18000)
+- **Backend API**: http://api.34.64.191.91 (또는 http://34.64.191.91:18001)
+- **API Docs**: http://api.34.64.191.91/docs
+- **Neo4j Browser**: http://neo4j.34.64.191.91 (또는 http://34.64.191.91:17474)
   - Username: `neo4j`
   - Password: `Neo4j2024!Graph!Secure`
 
-**포트 변경 이유**: nginx와 다른 시스템이 이미 설치되어 있어 기본 포트(3000, 8000, 7474)와 충돌하지 않도록 18xxx 대역 포트를 사용합니다.
+### URL 형식
+- **서브도메인 형식** (권장): `프로젝트명.34.64.191.91`
+  - `frontend.34.64.191.91` - 프론트엔드
+  - `api.34.64.191.91` - 백엔드 API
+  - `neo4j.34.64.191.91` - Neo4j 브라우저
+
+- **포트 직접 접속**: `34.64.191.91:포트번호`
+  - `34.64.191.91:18000` - 프론트엔드
+  - `34.64.191.91:18001` - 백엔드 API
+  - `34.64.191.91:17474` - Neo4j 브라우저
+
+### 포트 매핑
+- Frontend: `18000` → `3000` (컨테이너 내부)
+- Backend: `18001` → `8080` (컨테이너 내부)
+- Neo4j Browser: `17474` → `7474` (컨테이너 내부)
+- Neo4j Bolt: `17687` → `7687` (컨테이너 내부)
 
 ---
 
-## 🔧 Coolify 유용한 기능
+## 🔄 업데이트 및 재배포
 
-### 자동 배포 (CI/CD)
-
-1. **Settings** → **Deployments**
-2. **Auto Deploy on Git Push** 활성화
-3. GitHub Webhook이 자동으로 설정됩니다
-
-이제 `git push`만 하면 자동으로 배포됩니다!
-
-### 로그 확인
-
-1. 서비스 선택
-2. **Logs** 탭
-3. 실시간 로그 확인
-
-### 리소스 모니터링
-
-1. **Dashboard**
-2. CPU, 메모리, 디스크 사용량 확인
-
-### 백업 설정
-
-1. **Database 서비스** 선택
-2. **Backups** 탭
-3. **Enable Automatic Backups**
-4. 백업 주기 설정 (예: 매일, 매주)
-
----
-
-## 🚀 빠른 시작 (요약)
-
-Coolify가 이미 설치되어 있다면:
-
-### 1. GitHub 레포지토리 준비
+코드 변경 후 재배포:
 
 ```bash
-cd "/Users/gangseungsig/Documents/02_GitHub/12_InsureGraph Pro"
+#!/bin/bash
+# 업데이트 및 재배포 스크립트
 
-# 변경사항 커밋
-git add .
-git commit -m "Add Coolify deployment files"
-git push origin main
+COOLIFY_SERVER="34.64.191.91"
+
+# 1. 변경사항 전송
+rsync -avz --exclude 'node_modules' --exclude 'venv' --exclude '.next' \
+  ./ root@$COOLIFY_SERVER:/opt/insuregraph/
+
+# 2. 재배포 (AMD64)
+ssh root@$COOLIFY_SERVER << 'EOF'
+  cd /opt/insuregraph
+
+  # 기존 컨테이너 중지
+  docker-compose -f docker-compose.coolify.yml down
+
+  # AMD64 플랫폼으로 재빌드 및 시작
+  DOCKER_DEFAULT_PLATFORM=linux/amd64 \
+    docker-compose -f docker-compose.coolify.yml up -d --build
+
+  # 헬스체크
+  sleep 10
+  docker-compose -f docker-compose.coolify.yml ps
+EOF
+
+echo "✅ 재배포 완료!"
 ```
 
-### 2. Coolify에서 프로젝트 생성
-
-1. http://58.225.113.125 접속
-2. **New Project** → `InsureGraph Pro`
-3. **Add Resource** → **Git Repository**
-4. GitHub 레포지토리 연결
-
-### 3. 서비스 배포
-
-각 서비스별로:
-- **Add Service** → **Docker Compose**
-- `docker-compose.coolify.yml` 선택
-- 환경변수 설정
-- **Deploy** 클릭
-
 ---
 
-## 📊 Coolify vs Manual Docker 비교
+## 📊 모니터링 및 로그
 
-| 기능 | Coolify | Manual Docker |
-|------|---------|---------------|
-| **배포 시간** | 5분 | 15분 |
-| **CI/CD** | 자동 | 수동 |
-| **모니터링** | 내장 | 별도 설정 필요 |
-| **백업** | 자동 | 수동 |
-| **도메인** | 자동 SSL | 수동 설정 |
-| **롤백** | 원클릭 | 수동 |
-| **업데이트** | Git push만 | 파일 전송 + 재배포 |
+### 실시간 로그 확인
 
----
-
-## 🆘 트러블슈팅
-
-### 문제 1: Coolify가 설치되어 있지 않음
-
-Coolify 설치:
 ```bash
-ssh root@58.225.113.125
+# 모든 서비스 로그
+ssh root@34.64.191.91 "cd /opt/insuregraph && docker-compose -f docker-compose.coolify.yml logs -f"
 
-# Coolify 설치 (공식 방법)
-curl -fsSL https://cdn.coollabs.io/coolify/install.sh | bash
+# Backend만
+ssh root@34.64.191.91 "cd /opt/insuregraph && docker-compose -f docker-compose.coolify.yml logs -f backend"
+
+# Frontend만
+ssh root@34.64.191.91 "cd /opt/insuregraph && docker-compose -f docker-compose.coolify.yml logs -f frontend"
 ```
 
-설치 후 `http://58.225.113.125:8000`으로 접속
+### 서비스 상태 확인
 
-### 문제 2: 빌드 실패
+```bash
+ssh root@34.64.191.91 << 'EOF'
+  cd /opt/insuregraph
+  docker-compose -f docker-compose.coolify.yml ps
 
-1. **Logs** 탭에서 에러 확인
-2. 환경변수가 모두 설정되었는지 확인
-3. Dockerfile 경로 확인
+  # 리소스 사용량
+  docker stats --no-stream
+EOF
+```
 
-### 문제 3: 서비스 간 연결 실패
+### 헬스체크
 
-1. 모든 서비스가 같은 네트워크에 있는지 확인
-2. 호스트명을 서비스 이름으로 사용 (예: `postgres`, `redis`)
+```bash
+# Backend API
+curl -f http://34.64.191.91:18001/health
 
----
+# Frontend
+curl -f http://34.64.191.91:18000
 
-## 🎯 추천 배포 방식
-
-**Coolify 사용을 강력히 추천합니다!**
-
-이유:
-- ✅ Git push만으로 자동 배포
-- ✅ 웹 UI로 간편한 관리
-- ✅ 자동 SSL 인증서
-- ✅ 내장 모니터링
-- ✅ 원클릭 롤백
-- ✅ 자동 백업
+# Neo4j
+curl -f http://34.64.191.91:17474
+```
 
 ---
 
-**작성일**: 2025-12-05
-**Coolify 버전**: v4.x
-**대상 서버**: 58.225.113.125
+## 🛠️ 트러블슈팅
+
+### 문제 1: 플랫폼 아키텍처 불일치
+
+**증상**: `exec format error` 또는 `no matching manifest`
+
+**해결**:
+```bash
+# AMD64 플랫폼 명시적으로 지정
+ssh root@34.64.191.91 << 'EOF'
+  cd /opt/insuregraph
+
+  # buildx 사용하여 AMD64로 빌드
+  docker buildx build --platform linux/amd64 -t insuregraph-backend ./backend
+  docker buildx build --platform linux/amd64 -t insuregraph-frontend ./frontend
+
+  # 또는 환경변수로 지정
+  export DOCKER_DEFAULT_PLATFORM=linux/amd64
+  docker-compose -f docker-compose.coolify.yml up -d --build
+EOF
+```
+
+### 문제 2: 포트 충돌
+
+**증상**: `port is already allocated`
+
+**해결**:
+```bash
+ssh root@34.64.191.91 << 'EOF'
+  # 사용 중인 포트 확인
+  netstat -tulpn | grep -E "18000|18001|17474|17687"
+
+  # 충돌하는 프로세스 종료
+  docker-compose -f docker-compose.coolify.yml down
+
+  # 재시작
+  docker-compose -f docker-compose.coolify.yml up -d
+EOF
+```
+
+### 문제 3: 데이터베이스 연결 실패
+
+**증상**: `could not connect to server`
+
+**해결**:
+```bash
+ssh root@34.64.191.91 << 'EOF'
+  cd /opt/insuregraph
+
+  # 데이터베이스 상태 확인
+  docker-compose -f docker-compose.coolify.yml ps postgres redis neo4j
+
+  # 로그 확인
+  docker-compose -f docker-compose.coolify.yml logs postgres
+
+  # 재시작
+  docker-compose -f docker-compose.coolify.yml restart postgres
+
+  # Backend 재시작 (DB 준비 후)
+  sleep 10
+  docker-compose -f docker-compose.coolify.yml restart backend
+EOF
+```
+
+---
+
+## 🔐 보안 체크리스트
+
+배포 전 확인사항:
+
+- [ ] `.coolify.env` 파일에 실제 API 키 설정
+- [ ] Secret 키들을 강력한 랜덤 값으로 변경
+- [ ] PostgreSQL 비밀번호 변경
+- [ ] Neo4j 비밀번호 변경
+- [ ] CORS_ORIGINS에 실제 도메인만 추가
+- [ ] DEBUG=false 설정
+- [ ] 방화벽 규칙 설정 (필요한 포트만 개방)
+
+---
+
+## 💾 백업 및 복구
+
+### 데이터베이스 백업
+
+```bash
+ssh root@34.64.191.91 << 'EOF'
+  cd /opt/insuregraph
+
+  # PostgreSQL 백업
+  docker-compose -f docker-compose.coolify.yml exec -T postgres \
+    pg_dump -U insuregraph_user insuregraph > backup_$(date +%Y%m%d).sql
+
+  # Neo4j 백업
+  docker-compose -f docker-compose.coolify.yml exec neo4j \
+    neo4j-admin database dump neo4j --to-path=/backups
+EOF
+```
+
+### 복구
+
+```bash
+ssh root@34.64.191.91 << 'EOF'
+  cd /opt/insuregraph
+
+  # PostgreSQL 복구
+  cat backup_20251210.sql | \
+    docker-compose -f docker-compose.coolify.yml exec -T postgres \
+    psql -U insuregraph_user insuregraph
+EOF
+```
+
+---
+
+## 📝 자동화 스크립트
+
+전체 배포 자동화 스크립트 생성:
+
+```bash
+# deploy-to-coolify.sh 파일 생성
+cat > deploy-to-coolify.sh << 'SCRIPT'
+#!/bin/bash
+set -e
+
+COOLIFY_SERVER="34.64.191.91"
+PLATFORM="linux/amd64"
+PROJECT_DIR="/opt/insuregraph"
+
+echo "🚀 InsureGraph Pro 배포 시작..."
+echo "📍 서버: $COOLIFY_SERVER (Linux AMD64)"
+
+# 1. 소스코드 전송
+echo "📦 소스코드 전송 중..."
+rsync -avz --progress \
+  --exclude 'node_modules' \
+  --exclude 'venv' \
+  --exclude '.next' \
+  --exclude '__pycache__' \
+  --exclude '.git' \
+  ./ root@$COOLIFY_SERVER:$PROJECT_DIR/
+
+# 2. 환경변수 전송
+echo "🔧 환경변수 설정 중..."
+scp .coolify.env root@$COOLIFY_SERVER:$PROJECT_DIR/.env
+
+# 3. 배포 실행
+echo "🐳 Docker 컨테이너 빌드 및 시작 중..."
+ssh root@$COOLIFY_SERVER << EOF
+  cd $PROJECT_DIR
+
+  # 기존 컨테이너 중지 (첫 배포시는 무시)
+  docker-compose -f docker-compose.coolify.yml down 2>/dev/null || true
+
+  # AMD64 플랫폼으로 빌드 및 실행
+  DOCKER_DEFAULT_PLATFORM=$PLATFORM \
+    docker-compose -f docker-compose.coolify.yml up -d --build
+
+  echo "⏳ 서비스 시작 대기 중..."
+  sleep 15
+
+  # 데이터베이스 마이그레이션
+  echo "🗄️  데이터베이스 마이그레이션 실행 중..."
+  docker-compose -f docker-compose.coolify.yml exec -T backend alembic upgrade head
+
+  # 상태 확인
+  echo "📊 서비스 상태:"
+  docker-compose -f docker-compose.coolify.yml ps
+EOF
+
+# 4. 헬스체크
+echo "🏥 헬스체크 실행 중..."
+sleep 5
+
+if curl -f http://$COOLIFY_SERVER:18001/health > /dev/null 2>&1; then
+  echo "✅ Backend: http://$COOLIFY_SERVER:18001 (정상)"
+else
+  echo "❌ Backend: 응답 없음"
+fi
+
+if curl -f http://$COOLIFY_SERVER:18000 > /dev/null 2>&1; then
+  echo "✅ Frontend: http://$COOLIFY_SERVER:18000 (정상)"
+else
+  echo "❌ Frontend: 응답 없음"
+fi
+
+echo ""
+echo "🎉 배포 완료!"
+echo "🌐 접속 URL:"
+echo "   Frontend:  http://$COOLIFY_SERVER:18000"
+echo "   Backend:   http://$COOLIFY_SERVER:18001"
+echo "   API Docs:  http://$COOLIFY_SERVER:18001/docs"
+echo "   Neo4j:     http://$COOLIFY_SERVER:17474"
+SCRIPT
+
+chmod +x deploy-to-coolify.sh
+```
+
+사용법:
+```bash
+./deploy-to-coolify.sh
+```
+
+---
+
+## 🎯 "Coolify에 배포" 명령어 실행 시 자동 수행 항목
+
+1. ✅ **서버 정보 확인**
+   - IP: 34.64.191.91
+   - 플랫폼: Linux AMD64
+
+2. ✅ **환경 설정**
+   - 환경변수 파일 (.coolify.env) 확인
+   - API 키 검증
+   - 포트 매핑 확인 (18000, 18001, 17474, 17687)
+
+3. ✅ **Docker 빌드**
+   - `DOCKER_DEFAULT_PLATFORM=linux/amd64` 설정
+   - Backend 이미지 빌드
+   - Frontend 이미지 빌드
+
+4. ✅ **배포 실행**
+   - PostgreSQL, Redis, Neo4j 시작
+   - Backend API 시작
+   - Frontend 시작
+   - 데이터베이스 마이그레이션
+
+5. ✅ **검증**
+   - 헬스체크 수행
+   - 로그 확인
+   - 접속 URL 출력
+
+---
+
+**작성일**: 2025-12-10
+**서버**: 34.64.191.91 (Linux AMD64)
+**배포 방식**: CLI 기반 자동 배포

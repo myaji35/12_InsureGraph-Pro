@@ -70,6 +70,8 @@ export interface SimpleQueryResponse {
     text: string
     relevance_score: number
   }>
+  llm_provider: string
+  llm_model: string
 
   // Validation
   validation: ValidationInfo

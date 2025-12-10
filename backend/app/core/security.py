@@ -150,6 +150,41 @@ async def get_current_active_user(current_user: Dict[str, Any] = Depends(get_cur
     return current_user
 
 
+async def get_current_user_optional(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(HTTPBearer(auto_error=False))
+) -> Optional[Dict[str, Any]]:
+    """
+    FastAPI dependency to optionally extract current user from JWT token
+
+    Used for endpoints that work both with and without authentication.
+    Returns None if no token is provided.
+
+    Args:
+        credentials: Optional HTTP Bearer token from request header
+
+    Returns:
+        User data from token payload, or None if no token provided
+    """
+    if credentials is None:
+        return None
+
+    try:
+        token = credentials.credentials
+        payload = decode_token(token)
+
+        # Verify token type
+        if payload.get("type") != "access":
+            return None
+
+        user_id = payload.get("sub")
+        if user_id is None:
+            return None
+
+        return payload
+    except HTTPException:
+        return None
+
+
 def require_role(required_roles: list[str]):
     """
     Dependency factory for role-based access control

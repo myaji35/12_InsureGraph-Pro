@@ -15,6 +15,7 @@ import re
 
 from app.services.streaming_pdf_processor import StreamingPDFProcessor
 from app.services.upstage_document_parser import UpstageDocumentParser
+from app.services.smart_insurance_chunker import SmartInsuranceChunker
 
 
 class HybridDocumentProcessor:
@@ -43,6 +44,11 @@ class HybridDocumentProcessor:
 
         self.pdfplumber_processor = StreamingPDFProcessor()
         self.upstage_parser = UpstageDocumentParser()
+        self.smart_chunker = SmartInsuranceChunker(
+            max_chars=1500,
+            target_chars=1200,
+            min_chars=200
+        )
 
         # 통계 수집
         self.stats = {

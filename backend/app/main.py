@@ -80,15 +80,8 @@ app = FastAPI(
 )
 
 
-# CORS middleware
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.cors_origins_list,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
+# ⚠️  Middleware execution order: Last added = First executed
+# CORS must be added LAST to execute FIRST
 
 # GZip compression middleware
 app.add_middleware(GZipMiddleware, minimum_size=1000)
@@ -108,8 +101,26 @@ app.add_middleware(
 app.add_middleware(RequestLoggingMiddleware)
 
 
-# Rate limiting middleware (100 requests per minute by default)
-app.add_middleware(RateLimitMiddleware, max_requests=100, window_seconds=60)
+# Rate limiting middleware
+# ⚠️ In development: very high limit (10000/min) to avoid blocking dashboard polling
+# ⚠️ In production: strict limit (100/min) for security
+if settings.ENVIRONMENT == "production":
+    app.add_middleware(RateLimitMiddleware, max_requests=100, window_seconds=60)
+else:
+    # Development: 10000 requests per minute (effectively unlimited for local dev)
+    app.add_middleware(RateLimitMiddleware, max_requests=10000, window_seconds=60)
+
+
+# ✅ CORS middleware - MUST BE ADDED LAST (executes FIRST)
+# This ensures CORS headers are added before other middleware processing
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins_list,
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows GET, POST, PUT, DELETE, OPTIONS, etc.
+    allow_headers=["*"],  # Allows all headers
+    expose_headers=["*"],  # Exposes all headers to browser
+)
 
 
 # Health check endpoint

@@ -13,7 +13,7 @@ from psycopg2.extras import Json
 import json
 
 from app.core.database import get_pg_connection
-from app.core.security import get_current_active_user
+from app.core.security import get_current_active_user, get_current_user_optional
 from app.models.user import User
 from app.services.query_parser import get_query_parser, QueryIntent
 from app.services.local_search import get_local_search
@@ -35,7 +35,7 @@ class SimpleQueryRequest(BaseModel):
     customer_id: Optional[str] = Field(None, description="고객 ID (선택, 히스토리 추적용)")
     limit: int = Field(10, description="검색 결과 수", ge=1, le=50)
     use_traversal: bool = Field(True, description="그래프 탐색 사용 여부")
-    llm_provider: str = Field("openai", description="LLM 제공자 (openai/anthropic/mock)")
+    llm_provider: str = Field("google", description="LLM 제공자 (openai/anthropic/google/mock)")
 
 
 class EntityInfo(BaseModel):
@@ -96,6 +96,8 @@ class SimpleQueryResponse(BaseModel):
     answer: str
     confidence: float
     sources: List[Dict[str, Any]]
+    llm_provider: str  # LLM provider (google/openai/anthropic/mock)
+    llm_model: str  # LLM model name (gemini-2.5-flash, etc.)
 
     # Validation
     validation: ValidationInfo
@@ -113,7 +115,7 @@ class HealthResponse(BaseModel):
 @router.post("/execute", response_model=SimpleQueryResponse, summary="자연어 쿼리 실행 (Simple)")
 async def execute_simple_query(
     request: SimpleQueryRequest,
-    user: User = Depends(get_current_active_user),
+    user: Optional[Dict[str, Any]] = Depends(get_current_user_optional),  # Optional auth for dev
     db = Depends(get_pg_connection),
 ):
     """
@@ -132,7 +134,7 @@ async def execute_simple_query(
         "query": "암보험 1억원 이상 보장되는 경우는?",
         "limit": 10,
         "use_traversal": true,
-        "llm_provider": "openai"
+        "llm_provider": "google"
     }
     ```
     """
@@ -240,6 +242,8 @@ async def execute_simple_query(
             answer=reasoning_result.answer,
             confidence=validation_result.confidence,  # Use validated confidence
             sources=reasoning_result.sources[:10],  # Top 10 sources
+            llm_provider=reasoning_result.provider.value,
+            llm_model=reasoning_result.model,
             validation=ValidationInfo(
                 passed=validation_result.passed,
                 overall_level=validation_result.overall_level.value,

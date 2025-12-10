@@ -155,18 +155,22 @@ class LocalSearch:
         # Build regex pattern (OR of all keywords)
         pattern = "|".join(keywords)
 
+        # Search in actual node types: CoverageItem, Exclusion, Article, BenefitAmount, etc.
+        # Search in both 'text' and 'source_text' and 'description' properties
         query = """
         MATCH (n)
-        WHERE (n:Article OR n:Paragraph OR n:Subclause)
-          AND n.text =~ $pattern
-        OPTIONAL MATCH (n)<-[:HAS_PARAGRAPH|HAS_SUBCLAUSE*0..2]-(a:Article)
+        WHERE (n:Article OR n:Paragraph OR n:Subclause OR n:CoverageItem OR n:Exclusion
+               OR n:BenefitAmount OR n:PaymentCondition OR n:Period OR n:Term OR n:Rider)
+          AND (n.text =~ $pattern OR n.source_text =~ $pattern OR n.description =~ $pattern)
         RETURN DISTINCT
             labels(n)[0] AS node_type,
-            n.id AS node_id,
-            n.text AS text,
-            COALESCE(n.article_num, a.article_num) AS article_num,
-            COALESCE(n.title, a.title, '') AS article_title,
-            n.paragraph_num AS paragraph_num
+            COALESCE(n.id, n.entity_id) AS node_id,
+            COALESCE(n.text, n.source_text, n.description, '') AS text,
+            COALESCE(n.article_num, '') AS article_num,
+            COALESCE(n.title, n.label, '') AS article_title,
+            COALESCE(n.paragraph_num, '') AS paragraph_num,
+            COALESCE(n.insurer, '') AS insurer,
+            COALESCE(n.product_type, '') AS product_type
         LIMIT $limit
         """
 
@@ -179,15 +183,22 @@ class LocalSearch:
             )
 
             for record in records:
+                # Build metadata
+                metadata = {}
+                if record["insurer"]:
+                    metadata["insurer"] = record["insurer"]
+                if record["product_type"]:
+                    metadata["product_type"] = record["product_type"]
+
                 result = SearchResult(
                     node_type=record["node_type"],
                     node_id=record["node_id"],
                     text=record["text"],
                     relevance_score=1.0,  # Simple: all matches are equal
-                    metadata={},
-                    article_num=record["article_num"],
-                    article_title=record["article_title"],
-                    paragraph_num=record["paragraph_num"],
+                    metadata=metadata,
+                    article_num=record["article_num"] if record["article_num"] else None,
+                    article_title=record["article_title"] if record["article_title"] else None,
+                    paragraph_num=record["paragraph_num"] if record["paragraph_num"] else None,
                 )
                 results.append(result)
 

@@ -8,14 +8,18 @@ export default function SimpleLoginPage() {
   const [email, setEmail] = useState('admin@insuregraph.com')
   const [password, setPassword] = useState('Admin123!')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess('')
     setLoading(true)
 
     try {
+      console.log('🔐 로그인 시도:', { email, passwordLength: password.length })
+
       const response = await fetch('http://localhost:8000/api/v1/auth/login', {
         method: 'POST',
         headers: {
@@ -24,12 +28,34 @@ export default function SimpleLoginPage() {
         body: JSON.stringify({ email, password }),
       })
 
+      console.log('📡 응답 상태:', response.status, response.statusText)
+
       if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.detail || '로그인 실패')
+        let errorMessage = '로그인 실패'
+        try {
+          const data = await response.json()
+          console.error('❌ 에러 응답:', data)
+
+          // 상세한 에러 메시지 처리
+          if (data.detail) {
+            if (typeof data.detail === 'string') {
+              errorMessage = data.detail
+            } else if (data.detail.error_message) {
+              errorMessage = data.detail.error_message
+            } else if (Array.isArray(data.detail)) {
+              // FastAPI 유효성 검증 에러
+              errorMessage = data.detail.map((err: any) => err.msg).join(', ')
+            }
+          }
+        } catch (parseError) {
+          console.error('❌ 에러 파싱 실패:', parseError)
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
+      console.log('✅ 로그인 성공:', data.user.email)
 
       // 토큰 저장
       localStorage.setItem('access_token', data.access_token)
@@ -37,10 +63,15 @@ export default function SimpleLoginPage() {
         localStorage.setItem('refresh_token', data.refresh_token)
       }
 
+      setSuccess(`로그인 성공! ${data.user.full_name}님 환영합니다.`)
+
       // 대시보드로 이동
-      router.push('/dashboard')
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1000)
     } catch (err: any) {
-      setError(err.message)
+      console.error('❌ 로그인 에러:', err)
+      setError(err.message || '알 수 없는 오류가 발생했습니다')
     } finally {
       setLoading(false)
     }
