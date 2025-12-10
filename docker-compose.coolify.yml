@@ -48,9 +48,16 @@ services:
     networks:
       - insuregraph-network
     restart: unless-stopped
+    ports:
+      - "17474:7474"
+      - "17687:7687"
     labels:
       - "coolify.managed=true"
       - "coolify.type=database"
+      - "traefik.enable=true"
+      - "traefik.http.routers.insuregraph-neo4j.rule=Host(`InsureGraphPro.34.64.191.91`) && PathPrefix(`/neo4j`)"
+      - "traefik.http.routers.insuregraph-neo4j.entrypoints=web,websecure"
+      - "traefik.http.services.insuregraph-neo4j.loadbalancer.server.port=7474"
     healthcheck:
       test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD}", "RETURN 1"]
       interval: 30s
@@ -87,13 +94,14 @@ services:
       UPSTAGE_API_KEY: ${UPSTAGE_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY}
 
       # Environment
       ENVIRONMENT: production
       DEBUG: false
       LOG_LEVEL: INFO
 
-      # CORS - Coolify will set this
+      # CORS - Unified domain format
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
     volumes:
       - ./backend/logs:/app/logs
@@ -108,10 +116,16 @@ services:
       neo4j:
         condition: service_healthy
     restart: unless-stopped
+    ports:
+      - "18001:8080"
     labels:
       - "coolify.managed=true"
       - "coolify.type=application"
       - "coolify.port=8080"
+      - "traefik.enable=true"
+      - "traefik.http.routers.insuregraph-backend.rule=Host(`InsureGraphPro.34.64.191.91`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.insuregraph-backend.entrypoints=web,websecure"
+      - "traefik.http.services.insuregraph-backend.loadbalancer.server.port=8080"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/health"]
       interval: 30s
@@ -133,10 +147,17 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
+    ports:
+      - "18000:3000"
     labels:
       - "coolify.managed=true"
       - "coolify.type=application"
       - "coolify.port=3000"
+      - "traefik.enable=true"
+      - "traefik.http.routers.insuregraph-frontend.rule=Host(`InsureGraphPro.34.64.191.91`)"
+      - "traefik.http.routers.insuregraph-frontend.entrypoints=web,websecure"
+      - "traefik.http.routers.insuregraph-frontend.priority=1"
+      - "traefik.http.services.insuregraph-frontend.loadbalancer.server.port=3000"
 
   # Celery Worker
   celery-worker:

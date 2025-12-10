@@ -5,6 +5,7 @@
 - **서버 IP**: 34.64.191.91
 - **OS/Architecture**: Linux AMD64
 - **배포 방식**: CLI 기반 자동 배포
+- **프로젝트 도메인**: https://InsureGraphPro.34.64.191.91 (통합 도메인)
 
 ## 📋 빠른 배포 명령어
 
@@ -148,36 +149,33 @@ GOOGLE_API_KEY=your-google-api-key-here
 OPENAI_API_KEY=your-openai-api-key
 UPSTAGE_API_KEY=your-upstage-api-key
 
-# CORS
-CORS_ORIGINS=http://frontend.34.64.191.91,http://34.64.191.91:18000,http://localhost:3000
+# CORS - Unified domain format
+CORS_ORIGINS=https://InsureGraphPro.34.64.191.91,http://InsureGraphPro.34.64.191.91,http://localhost:3000
 
-# Frontend
-NEXT_PUBLIC_API_URL=http://api.34.64.191.91
+# Frontend API URL - Path-based routing
+NEXT_PUBLIC_API_URL=https://InsureGraphPro.34.64.191.91/api
 ```
 
 ---
 
 ## 🌐 배포된 서비스 접속 정보
 
-배포 완료 후 접속 URL (서브도메인 형식):
+배포 완료 후 접속 URL (통합 도메인 형식):
 
-- **Frontend**: http://frontend.34.64.191.91 (또는 http://34.64.191.91:18000)
-- **Backend API**: http://api.34.64.191.91 (또는 http://34.64.191.91:18001)
-- **API Docs**: http://api.34.64.191.91/docs
-- **Neo4j Browser**: http://neo4j.34.64.191.91 (또는 http://34.64.191.91:17474)
+### 통합 도메인 (권장)
+- **메인 URL**: https://InsureGraphPro.34.64.191.91
+  - Frontend: https://InsureGraphPro.34.64.191.91/
+  - Backend API: https://InsureGraphPro.34.64.191.91/api
+  - API Docs: https://InsureGraphPro.34.64.191.91/api/docs
+  - Neo4j Browser: https://InsureGraphPro.34.64.191.91/neo4j
+
+### 포트 직접 접속 (대체 방법)
+- **Frontend**: http://34.64.191.91:18000
+- **Backend API**: http://34.64.191.91:18001
+- **API Docs**: http://34.64.191.91:18001/docs
+- **Neo4j Browser**: http://34.64.191.91:17474
   - Username: `neo4j`
   - Password: `Neo4j2024!Graph!Secure`
-
-### URL 형식
-- **서브도메인 형식** (권장): `프로젝트명.34.64.191.91`
-  - `frontend.34.64.191.91` - 프론트엔드
-  - `api.34.64.191.91` - 백엔드 API
-  - `neo4j.34.64.191.91` - Neo4j 브라우저
-
-- **포트 직접 접속**: `34.64.191.91:포트번호`
-  - `34.64.191.91:18000` - 프론트엔드
-  - `34.64.191.91:18001` - 백엔드 API
-  - `34.64.191.91:17474` - Neo4j 브라우저
 
 ### 포트 매핑
 - Frontend: `18000` → `3000` (컨테이너 내부)
